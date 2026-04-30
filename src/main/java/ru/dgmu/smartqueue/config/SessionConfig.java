@@ -1,6 +1,7 @@
 package ru.dgmu.smartqueue.config;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -14,7 +15,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 import org.springframework.session.web.context.AbstractHttpSessionApplicationInitializer;
 
 @Configuration
-@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 60)
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 300)
 public class SessionConfig extends AbstractHttpSessionApplicationInitializer {
     @Bean
     public JedisConnectionFactory connectionFactory() {
@@ -25,14 +26,16 @@ public class SessionConfig extends AbstractHttpSessionApplicationInitializer {
     public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
         ObjectMapper mapper = new ObjectMapper();
 
-        // Регистрируем модуль для работы с датами (Instant, LocalDateTime и т.д.)
+        // 1. ГЛАВНОЕ: игнорируем поля из JSON, которых нет в классе User
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        // 2. Поддержка Java 8 Time (Instant, LocalDateTime)
         mapper.registerModule(new JavaTimeModule());
 
-        // Важно для Spring Security: регистрируем модули безопасности,
-        // чтобы Jackson понимал, как десериализовать UserDetails и Authorities
+        // 3. Поддержка типов Spring Security
         mapper.registerModules(SecurityJackson2Modules.getModules(getClass().getClassLoader()));
 
-        // Настраиваем сохранение информации о типах, чтобы Jackson знал, в какой класс превращать JSON
+        // 4. Сохранение информации о типах (чтобы Jackson знал, что это класс User)
         mapper.activateDefaultTyping(
             LaissezFaireSubTypeValidator.instance,
             ObjectMapper.DefaultTyping.NON_FINAL,

@@ -1,5 +1,7 @@
 package ru.dgmu.smartqueue.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,6 +16,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Data
@@ -39,12 +42,18 @@ public class User implements UserDetails {
   @Column(name = "email", unique = true, nullable = false)
   private String email;
 
+  @JsonProperty("enabled")
   @Column(name = "is_enabled", nullable = false)
   private Boolean isEnabled;
 
+  @jakarta.persistence.Transient
+  @JsonDeserialize(contentAs = SimpleGrantedAuthority.class)
+  private List<SimpleGrantedAuthority> authorities;
+
+  @JsonDeserialize(contentAs = SimpleGrantedAuthority.class)
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of();
+    return this.authorities != null ? this.authorities : List.of();
   }
 
   @Override
