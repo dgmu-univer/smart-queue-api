@@ -3,7 +3,7 @@ spring:
     timeout: 5m
   data:
     redis:
-      host: ${REDIST_HOST:localhost}
+      host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
   application:
     name: smart-queue
