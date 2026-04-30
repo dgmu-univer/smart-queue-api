@@ -1,4 +1,10 @@
 spring:
+  session:
+    timeout: 5m
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
   application:
     name: smart-queue
   datasource:
@@ -10,8 +16,13 @@ spring:
       maximum-pool-size: 10
       minimum-idle: 5
       connection-timeout: 30000
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
 
 server:
   servlet:
     context-path: /api
+    session:
+      timeout: 1m
+      tracking-modes: cookie
 

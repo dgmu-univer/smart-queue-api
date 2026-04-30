@@ -1,30 +1,43 @@
 package ru.dgmu.smartqueue.config;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import ru.dgmu.smartqueue.service.UserService;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+  private final UserService userService;
+
   @Bean
-  @SuppressWarnings(value = "all")
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.csrf(Customizer.withDefaults())
-        // Своего рода отключение CORS (разрешение запросов со всех доменов)
+  public SecurityFilterChain filterChain(HttpSecurity http) {
+    http
+        .csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/admin/**").permitAll()
+            .requestMatchers("/public/**").permitAll()
+            .anyRequest().authenticated()
+        )
         .cors(cors -> cors.configurationSource(request -> {
           var corsConfiguration = new CorsConfiguration();
           corsConfiguration.setAllowedOriginPatterns(List.of("*"));
@@ -33,19 +46,36 @@ public class SecurityConfig {
           corsConfiguration.setAllowCredentials(true);
           return corsConfiguration;
         }))
-        // Настройка доступа к конечным точкам
-        .authorizeHttpRequests(request -> request
-            .requestMatchers("/mock**").permitAll()
-//            .requestMatchers("/", "/ws/**", "/chat-websocket/**").permitAll()
-//            .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
-//            .requestMatchers("/endpoint", "/admin/**").hasRole("ADMIN")
-            .anyRequest().authenticated())
-//        .formLogin(form -> form.loginPage("/sign-in"))
-        .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS));
-//        .authenticationProvider(authenticationProvider())
-//        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-//        .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint);
+        .formLogin(form -> form
+            .loginProcessingUrl("/api/login")
+            // Успешный вход без редиректа (возвращаем 200 OK)
+            .successHandler((req, res, auth) -> res.setStatus(200))
+            // Ошибка входа без редиректа (возвращаем 401)
+            .failureHandler((req, res, exp) -> res.setStatus(401))
+        )
+        .authenticationProvider(authenticationProvider())
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            .sessionFixation().migrateSession() // Обновляет ID сессии после логина
+        );
+
     return http.build();
   }
 
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  public AuthenticationProvider authenticationProvider() {
+    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userService.userDetailsService());
+    authProvider.setPasswordEncoder(passwordEncoder());
+    return authProvider;
+  }
+
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
+    return config.getAuthenticationManager();
+  }
 }
