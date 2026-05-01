@@ -33,6 +33,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/admin/**").permitAll()
             .requestMatchers("/public/**").permitAll()
+            .requestMatchers("/actuator/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/login").permitAll()
             .anyRequest().authenticated()
         )
