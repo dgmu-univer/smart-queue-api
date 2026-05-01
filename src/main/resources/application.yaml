@@ -26,3 +26,13 @@ server:
       timeout: 1m
       tracking-modes: cookie
 
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.data.redis: DEBUG
+    org.springframework.data.redis.connection: DEBUG
+    org.springframework.data.redis.core: DEBUG
+    redis.clients.jedis: DEBUG
+    org.springframework.session: DEBUG
+    org.springframework.session.data.redis: DEBUG
