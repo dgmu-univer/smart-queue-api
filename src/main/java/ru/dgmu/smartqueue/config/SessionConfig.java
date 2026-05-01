@@ -8,8 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
@@ -27,34 +26,21 @@ public class SessionConfig extends AbstractHttpSessionApplicationInitializer {
     private int redisPort;
 
     @Bean
-    public JedisConnectionFactory jedisConnectionFactory() {
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
-        config.setHostName(redisHost);
-        config.setPort(redisPort);
-
-        return new JedisConnectionFactory(config);
+    public LettuceConnectionFactory jedisConnectionFactory() {
+        return new LettuceConnectionFactory(redisHost, redisPort);
     }
 
     @Bean
     public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
         ObjectMapper mapper = new ObjectMapper();
-
-        // 1. ГЛАВНОЕ: игнорируем поля из JSON, которых нет в классе User
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        // 2. Поддержка Java 8 Time (Instant, LocalDateTime)
         mapper.registerModule(new JavaTimeModule());
-
-        // 3. Поддержка типов Spring Security
         mapper.registerModules(SecurityJackson2Modules.getModules(getClass().getClassLoader()));
-
-        // 4. Сохранение информации о типах (чтобы Jackson знал, что это класс User)
         mapper.activateDefaultTyping(
             LaissezFaireSubTypeValidator.instance,
             ObjectMapper.DefaultTyping.NON_FINAL,
             JsonTypeInfo.As.PROPERTY
         );
-
         return new GenericJackson2JsonRedisSerializer(mapper);
     }
 
