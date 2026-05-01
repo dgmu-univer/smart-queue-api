@@ -15,8 +15,8 @@ public class CreateAdminController {
   private final UserService userService;
 
 
-  @GetMapping("/admin")
-  public void createAdmin() {
-    userService.create(new User(null, "admin", passwordEncoder.encode("password"), "admin@example.com", true, List.of()));
-  }
+//  @GetMapping("/admin")
+//  public void createAdmin() {
+//    userService.create(new User(null, "admin", passwordEncoder.encode("password"), "admin@example.com", true, List.of()));
+//  }
 }

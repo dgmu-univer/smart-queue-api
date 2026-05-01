@@ -4,20 +4,17 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import ru.dgmu.smartqueue.service.UserService;
@@ -36,6 +33,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/admin/**").permitAll()
             .requestMatchers("/public/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/login").permitAll()
             .anyRequest().authenticated()
         )
         .cors(cors -> cors.configurationSource(request -> {
@@ -46,13 +44,6 @@ public class SecurityConfig {
           corsConfiguration.setAllowCredentials(true);
           return corsConfiguration;
         }))
-        .formLogin(form -> form
-            .loginProcessingUrl("/api/login")
-            // Успешный вход без редиректа (возвращаем 200 OK)
-            .successHandler((req, res, auth) -> res.setStatus(200))
-            // Ошибка входа без редиректа (возвращаем 401)
-            .failureHandler((req, res, exp) -> res.setStatus(401))
-        )
         .authenticationProvider(authenticationProvider())
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
