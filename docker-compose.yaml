@@ -15,6 +15,17 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       REDIS_HOST: ${REDIS_HOST:-redis}
       REDIS_PORT: ${REDIS_PORT:-6379}
+      JAVA_OPTS: >-
+        -XX:+UseContainerSupport
+        -XX:MaxRAMPercentage=75.0
+        -XX:InitialRAMPercentage=50.0
+        -XX:+UseG1GC
+        -XX:+UseStringDeduplication
+        -Djava.security.egd=file:/dev/./urandom
+        -Dspring.data.redis.host=redis
+        -Dspring.data.redis.port=6379
+        -Dspring.redis.host=redis
+        -Dspring.redis.port=6379
     depends_on:
       db:
         condition: service_healthy
