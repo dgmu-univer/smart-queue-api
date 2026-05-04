@@ -1,6 +1,6 @@
 spring:
   session:
-    timeout: 5m
+    timeout: 3600m
   data:
     redis:
       host: ${REDIS_HOST:localhost}
