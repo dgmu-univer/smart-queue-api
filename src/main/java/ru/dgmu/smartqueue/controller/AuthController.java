@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.dgmu.smartqueue.dto.SignInRequestDto;
+import ru.dgmu.smartqueue.dto.UserDto;
+import ru.dgmu.smartqueue.dto.UserDto.UserContextPresentationDto;
+import ru.dgmu.smartqueue.entity.User;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +27,7 @@ public class AuthController {
   private final AuthenticationManager authenticationManager;
 
   @PostMapping("/login")
-  public ResponseEntity<Void> login(
+  public ResponseEntity<UserContextPresentationDto> login(
       @RequestBody SignInRequestDto request,
       HttpServletRequest httpRequest
   ) {
@@ -49,7 +52,9 @@ public class AuthController {
         context
     );
 
-    return ResponseEntity.ok().build();
+    User user = (User) authentication.getPrincipal();
+    UserDto userDto = UserDto.fromEntity(user);
+    return ResponseEntity.ok(userDto.getUserContextPresentation());
   }
 
   @PostMapping("/logout")
