@@ -1,9 +1,11 @@
 package ru.dgmu.smartqueue.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -55,14 +57,14 @@ public class User implements UserDetails {
   @Column(name = "is_enabled", nullable = false)
   private Boolean isEnabled;
 
-  @jakarta.persistence.Transient
-  @JsonDeserialize(contentAs = SimpleGrantedAuthority.class)
-  private List<SimpleGrantedAuthority> authorities;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "role", nullable = false)
+  private Role role;
 
-  @JsonDeserialize(contentAs = SimpleGrantedAuthority.class)
+  @JsonIgnore
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return this.authorities != null ? this.authorities : List.of();
+    return role != null ? List.of(new SimpleGrantedAuthority(role.name())) : List.of();
   }
 
   @Override
@@ -93,5 +95,10 @@ public class User implements UserDetails {
   @Override
   public boolean isEnabled() {
     return this.isEnabled;
+  }
+
+  public enum Role {
+    OPERATOR,
+    ADMIN
   }
 }

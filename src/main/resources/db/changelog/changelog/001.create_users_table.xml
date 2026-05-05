@@ -37,6 +37,9 @@
       <column name="is_enabled" type="BOOLEAN" defaultValueBoolean="true">
         <constraints nullable="false"/>
       </column>
+      <column name="role" type="varchar(50)">
+        <constraints nullable="false"/>
+      </column>
     </createTable>
 
     <comment>Initial creation of users table for security</comment>

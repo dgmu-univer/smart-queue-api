@@ -1,8 +1,7 @@
 package ru.dgmu.smartqueue.dto;
 
-import java.util.Collection;
-import org.springframework.security.core.GrantedAuthority;
 import ru.dgmu.smartqueue.entity.User;
+import ru.dgmu.smartqueue.entity.User.Role;
 
 public record UserDto(
     Long id,
@@ -13,7 +12,7 @@ public record UserDto(
     String password,
     String email,
     Boolean isEnabled,
-    Collection<? extends GrantedAuthority> authorities
+    Role role
 ) {
 
   private static final String FULL_FIO_FORMAT = "%s %s %s";
@@ -29,15 +28,16 @@ public record UserDto(
         user.getPassword(),
         user.getEmail(),
         user.isEnabled(),
-        user.getAuthorities()
+        user.getRole()
     );
   }
 
-  public UserInfoDto getUserInfo() {
-    return new UserInfoDto(
+  public UserContextPresentationDto getUserContextPresentation() {
+    return new UserContextPresentationDto(
         getFio(),
         username,
-        email
+        email,
+        role.name()
     );
   }
 
@@ -51,10 +51,11 @@ public record UserDto(
     return lastName != null;
   }
 
-  public record UserInfoDto(
+  public record UserContextPresentationDto(
       String fio,
       String username,
-      String email
+      String email,
+      String role
   ) {
   }
 }
