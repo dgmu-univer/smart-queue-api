@@ -1,4 +1,4 @@
-package ru.dgmu.smartqueue.config;
+package ru.dgmu.smartqueue.configs;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
-import ru.dgmu.smartqueue.service.UserService;
+import ru.dgmu.smartqueue.services.UserService;
 
 @Configuration
 @EnableWebSecurity

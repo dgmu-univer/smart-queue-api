@@ -18,6 +18,8 @@ spring:
       connection-timeout: 30000
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
+  jpa:
+    generate-ddl: false
 
 server:
   servlet:

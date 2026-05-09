@@ -1,7 +1,7 @@
-package ru.dgmu.smartqueue.dto;
+package ru.dgmu.smartqueue.dtos;
 
-import ru.dgmu.smartqueue.entity.User;
-import ru.dgmu.smartqueue.entity.User.Role;
+import ru.dgmu.smartqueue.entites.User;
+import ru.dgmu.smartqueue.entites.User.Role;
 
 public record UserDto(
     Long id,

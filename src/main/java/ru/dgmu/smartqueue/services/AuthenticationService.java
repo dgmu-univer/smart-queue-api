@@ -1,6 +1,6 @@
-package ru.dgmu.smartqueue.service;
+package ru.dgmu.smartqueue.services;
 
-import ru.dgmu.smartqueue.dto.SignInRequestDto;
+import ru.dgmu.smartqueue.dtos.SignInRequestDto;
 
 public interface AuthenticationService {
     void signIn(SignInRequestDto signInRequest);

@@ -1,4 +1,4 @@
-package ru.dgmu.smartqueue.config;
+package ru.dgmu.smartqueue.configs;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DeserializationFeature;
