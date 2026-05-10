@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="002.create_admin_settings_table-1" author="senior_dev">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="admin_settings"/>
+      </not>
+    </preConditions>
+
+    <createSequence sequenceName="admin_setting_id_seq" startValue="1" incrementBy="1"/>
+
+    <createTable tableName="admin_settings">
+      <column name="resource" type="VARCHAR(50)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="settings" type="JSONB">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <comment>Initial creation of admin settings</comment>
+  </changeSet>
+
+  <changeSet id="002.create_admin_settings_table-2" author="senior_dev">
+    <preConditions onFail="MARK_RAN">
+      <tableIsEmpty tableName="admin_settings"/>
+    </preConditions>
+
+    <sql>
+      INSERT INTO admin_settings (resource, settings)
+      VALUES ('PERIODS',
+              '{
+                "work_date": {"start_date": "2026-01-01", "end_date": "2026-01-30"},
+                "work_time": {"start_time": "09:00", "end_time": "15:00"},
+                "lunch": {"start_time": "12:00", "end_time": "13:00"}
+              }'),
+             ('SLOTS',
+              '{"duration_minutes": 15, "capacity_per_slot": 1}'),
+             ('NON_WORKING_DAYS',
+              '["2026-01-01", "2026-01-02", "2026-01-03"]');
+    </sql>
+  </changeSet>
+
+</databaseChangeLog>

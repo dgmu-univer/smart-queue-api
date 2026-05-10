@@ -1,4 +1,4 @@
-package ru.dgmu.smartqueue.entity;
+package ru.dgmu.smartqueue.entites;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ru.dgmu.smartqueue.enums.Role;
 
 @Data
 @Builder
@@ -35,30 +36,30 @@ public class User implements UserDetails {
   @SequenceGenerator(name = "user_id_seq", sequenceName = "user_id_seq", allocationSize = 1)
   private Long id;
 
-  @Column(name = "first_name", nullable = false)
+  @Column(name = "first_name")
   private String firstName;
 
-  @Column(name = "middle_name", nullable = false)
+  @Column(name = "middle_name")
   private String middleName;
 
   @Column(name = "last_name")
   private String lastName;
 
-  @Column(name = "username", unique = true, nullable = false)
+  @Column(name = "username")
   private String username;
 
-  @Column(name = "password", nullable = false)
+  @Column(name = "password")
   private String password;
 
-  @Column(name = "email", unique = true, nullable = false)
+  @Column(name = "email")
   private String email;
 
   @JsonProperty("enabled")
-  @Column(name = "is_enabled", nullable = false)
+  @Column(name = "is_enabled")
   private Boolean isEnabled;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "role", nullable = false)
+  @Column(name = "role")
   private Role role;
 
   @JsonIgnore
@@ -95,10 +96,5 @@ public class User implements UserDetails {
   @Override
   public boolean isEnabled() {
     return this.isEnabled;
-  }
-
-  public enum Role {
-    OPERATOR,
-    ADMIN
   }
 }

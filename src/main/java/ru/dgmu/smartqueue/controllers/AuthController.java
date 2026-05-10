@@ -1,4 +1,4 @@
-package ru.dgmu.smartqueue.controller;
+package ru.dgmu.smartqueue.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,10 +15,10 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import ru.dgmu.smartqueue.dto.SignInRequestDto;
-import ru.dgmu.smartqueue.dto.UserDto;
-import ru.dgmu.smartqueue.dto.UserDto.UserContextPresentationDto;
-import ru.dgmu.smartqueue.entity.User;
+import ru.dgmu.smartqueue.dtos.SignInRequestDto;
+import ru.dgmu.smartqueue.dtos.UserDto;
+import ru.dgmu.smartqueue.dtos.UserDto.UserContextPresentationDto;
+import ru.dgmu.smartqueue.entites.User;
 
 @RestController
 @RequiredArgsConstructor

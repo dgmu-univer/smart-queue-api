@@ -1,11 +1,11 @@
-package ru.dgmu.smartqueue.service;
+package ru.dgmu.smartqueue.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.dgmu.smartqueue.entity.User;
-import ru.dgmu.smartqueue.repository.UserRepository;
+import ru.dgmu.smartqueue.entites.User;
+import ru.dgmu.smartqueue.repositories.UserRepository;
 
 @Service
 @RequiredArgsConstructor

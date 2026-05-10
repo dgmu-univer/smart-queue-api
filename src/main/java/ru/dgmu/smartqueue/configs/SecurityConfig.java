@@ -1,4 +1,4 @@
-package ru.dgmu.smartqueue.config;
+package ru.dgmu.smartqueue.configs;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
-import ru.dgmu.smartqueue.service.UserService;
+import ru.dgmu.smartqueue.services.UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -31,10 +31,10 @@ public class SecurityConfig {
     http
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/admin/**").permitAll()
             .requestMatchers("/public/**").permitAll()
             .requestMatchers("/actuator/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/login").permitAll()
+            .requestMatchers("/admin/**", "/admin-settings/**", "/swagger-ui/**").permitAll()
             .anyRequest().authenticated()
         )
         .cors(cors -> cors.configurationSource(request -> {
@@ -48,7 +48,7 @@ public class SecurityConfig {
         .authenticationProvider(authenticationProvider())
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-            .sessionFixation().migrateSession() // Обновляет ID сессии после логина
+            .sessionFixation().migrateSession()
         );
 
     return http.build();

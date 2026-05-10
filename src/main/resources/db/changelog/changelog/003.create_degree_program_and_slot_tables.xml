@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="003.create_degree_program_and_slot_tables-1" author="senior_dev">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="degree_programs"/>
+      </not>
+    </preConditions>
+
+    <createSequence sequenceName="degree_program_id_seq" startValue="1" incrementBy="1"/>
+
+    <createTable tableName="degree_programs">
+      <column name="id" type="BIGINT" defaultValueComputed="nextval('degree_program_id_seq')">
+        <constraints primaryKey="true" primaryKeyName="pk_degree_programs_id" nullable="false"/>
+      </column>
+      <column name="name" type="VARCHAR(255)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+      <column name="pin" type="VARCHAR(6)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="description" type="VARCHAR(255)">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+
+    <comment>Initial creation of degree program</comment>
+  </changeSet>
+
+  <changeSet id="003.create_degree_program_and_slot_tables-2" author="senior_dev">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="slots"/>
+      </not>
+    </preConditions>
+
+    <createSequence sequenceName="slot_id_seq" startValue="1" incrementBy="1"/>
+
+    <createTable tableName="slots">
+      <column name="id" type="BIGINT" defaultValueComputed="nextval('slot_id_seq')">
+        <constraints primaryKey="true" primaryKeyName="pk_slots_id" nullable="false"/>
+      </column>
+      <column name="degree_program_id" type="BIGINT">
+        <constraints nullable="false" references="degree_programs(id)"
+          foreignKeyName="fk_slots_degree_program"/>
+      </column>
+      <column name="start_time_at" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="end_time_at" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="availiable_count" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <addUniqueConstraint tableName="slots" columnNames="degree_program_id, start_time_at, end_time_at"/>
+
+    <comment>Initial creation of slots table</comment>
+  </changeSet>
+
+</databaseChangeLog>

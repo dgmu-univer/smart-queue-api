@@ -1,13 +1,13 @@
-package ru.dgmu.smartqueue.controller;
+package ru.dgmu.smartqueue.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.dgmu.smartqueue.dto.UserDto;
-import ru.dgmu.smartqueue.dto.UserDto.UserContextPresentationDto;
-import ru.dgmu.smartqueue.entity.User;
+import ru.dgmu.smartqueue.dtos.UserDto;
+import ru.dgmu.smartqueue.dtos.UserDto.UserContextPresentationDto;
+import ru.dgmu.smartqueue.entites.User;
 
 @RestController
 @Slf4j
