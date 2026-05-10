@@ -24,9 +24,4 @@ public class UserInfoController {
         }
     }
 
-    @GetMapping("/you")
-    public String getYou() {
-        return "Привет, ";
-    }
-
 }
