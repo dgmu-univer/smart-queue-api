@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ru.dgmu.smartqueue.enums.Role;
 
 @Data
 @Builder
@@ -95,10 +96,5 @@ public class User implements UserDetails {
   @Override
   public boolean isEnabled() {
     return this.isEnabled;
-  }
-
-  public enum Role {
-    OPERATOR,
-    ADMIN
   }
 }
