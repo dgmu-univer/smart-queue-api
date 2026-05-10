@@ -23,5 +23,5 @@ public class AdminSetting {
 
   @Column(name = "settings")
   @JdbcTypeCode(SqlTypes.JSON)
-  private String settings;
+  private Object settings;
 }
