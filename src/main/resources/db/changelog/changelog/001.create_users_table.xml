@@ -45,4 +45,25 @@
     <comment>Initial creation of users table for security</comment>
   </changeSet>
 
+  <changeSet id="001.create_users_table-2" author="senior_dev">
+
+    <preConditions onFail="MARK_RAN">
+      <tableIsEmpty tableName="users"/>
+    </preConditions>
+
+
+    <sql>
+      INSERT INTO queue.users (id, username, first_name, middle_name, last_name, password, email,
+                               is_enabled, role)
+      VALUES (1, 'user', 'ruslan', 'gadzhiev', 'yunusovich',
+              '$2a$10$MoBQnIfkOsC/dVfjNriBX.7mlUbE7rigy3.0y3uftQ69dH8x8XDMa', 'user@mail.ru', true,
+              'OPERATOR');
+      INSERT INTO queue.users (id, username, first_name, middle_name, last_name, password, email,
+                               is_enabled, role)
+      VALUES (2, 'admin', 'admin', 'admin', 'admin',
+              '$2a$10$MoBQnIfkOsC/dVfjNriBX.7mlUbE7rigy3.0y3uftQ69dH8x8XDMa', 'admin@mail.ru', true,
+              'ADMIN');
+    </sql>
+  </changeSet>
+
 </databaseChangeLog>

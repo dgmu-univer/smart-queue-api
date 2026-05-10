@@ -15,21 +15,35 @@
     <createSequence sequenceName="admin_setting_id_seq" startValue="1" incrementBy="1"/>
 
     <createTable tableName="admin_settings">
-      <column name="id" type="BIGINT" defaultValueComputed="nextval('admin_setting_id_seq')">
-        <constraints primaryKey="true" primaryKeyName="pk_admin_settings_id" nullable="false"/>
-      </column>
       <column name="resource" type="VARCHAR(50)">
-        <constraints nullable="false"/>
+        <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="key" type="VARCHAR(50)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="value" type="TEXT">
+      <column name="settings" type="JSONB">
         <constraints nullable="false"/>
       </column>
     </createTable>
 
     <comment>Initial creation of admin settings</comment>
+  </changeSet>
+
+  <changeSet id="002.create_admin_settings_table-2" author="senior_dev">
+    <preConditions onFail="MARK_RAN">
+      <tableIsEmpty tableName="admin_settings"/>
+    </preConditions>
+
+    <sql>
+      INSERT INTO admin_settings (resource, settings)
+      VALUES ('PERIODS',
+              '{
+                "work_date": {"start_date": "2026-01-01", "end_date": "2026-01-30"},
+                "work_time": {"start_time": "09:00", "end_time": "15:00"},
+                "lunch": {"start_time": "12:00", "end_time": "13:00"}
+              }'),
+             ('SLOTS',
+              '{"duration_minutes": 15, "capacity_per_slot": 1}'),
+             ('NON_WORKING_DAYS',
+              '["2026-01-01", "2026-01-02", "2026-01-03"]');
+    </sql>
   </changeSet>
 
 </databaseChangeLog>

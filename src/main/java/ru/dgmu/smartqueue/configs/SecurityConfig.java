@@ -31,10 +31,10 @@ public class SecurityConfig {
     http
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/admin/**").permitAll()
             .requestMatchers("/public/**").permitAll()
             .requestMatchers("/actuator/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/login").permitAll()
+            .requestMatchers("/admin/**", "/admin-settings/**", "/swagger-ui/**").permitAll()
             .anyRequest().authenticated()
         )
         .cors(cors -> cors.configurationSource(request -> {
@@ -48,7 +48,7 @@ public class SecurityConfig {
         .authenticationProvider(authenticationProvider())
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-            .sessionFixation().migrateSession() // Обновляет ID сессии после логина
+            .sessionFixation().migrateSession()
         );
 
     return http.build();
