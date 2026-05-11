@@ -7,31 +7,36 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
 public class PinAuthenticationToken extends AbstractAuthenticationToken {
-    private final Object pin;
 
-    // Пустой конструктор для десериализации (Jackson)
-    public PinAuthenticationToken() {
-        super((Collection<? extends GrantedAuthority>) null);
-        this.pin = null;
-        setAuthenticated(false);
-    }
+  private final Object pin;
 
-    // Конструктор для создания (до аутентификации)
-    public PinAuthenticationToken(Object pin) {
-        super((Collection<? extends GrantedAuthority>) null);
-        this.pin = pin;
-        setAuthenticated(false);
-    }
+  public PinAuthenticationToken() {
+    super((Collection<? extends GrantedAuthority>) null);
+    this.pin = null;
+    setAuthenticated(false);
+  }
 
-    // Конструктор для успешной аутентификации
-    @JsonCreator // Помогает Jackson правильно собрать объект из Redis
-    public PinAuthenticationToken(@JsonProperty("principal") Object pin,
-        @JsonProperty("authorities") Collection<? extends GrantedAuthority> authorities) {
-        super(authorities);
-        this.pin = pin;
-        super.setAuthenticated(true);
-    }
+  public PinAuthenticationToken(Object pin) {
+    super((Collection<? extends GrantedAuthority>) null);
+    this.pin = pin;
+    setAuthenticated(false);
+  }
 
-    @Override public Object getCredentials() { return pin; }
-    @Override public Object getPrincipal() { return pin; }
+  @JsonCreator
+  public PinAuthenticationToken(@JsonProperty("principal") Object pin,
+      @JsonProperty("authorities") Collection<? extends GrantedAuthority> authorities) {
+    super(authorities);
+    this.pin = pin;
+    super.setAuthenticated(true);
+  }
+
+  @Override
+  public Object getCredentials() {
+    return pin;
+  }
+
+  @Override
+  public Object getPrincipal() {
+    return pin;
+  }
 }
