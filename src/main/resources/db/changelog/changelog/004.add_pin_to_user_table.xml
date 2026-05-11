@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="004.add_pin_to_user_table-1" author="senior_dev">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="users" columnName="pin"/>
+      </not>
+    </preConditions>
+
+    <addColumn tableName="users">
+      <column name="pin" type="VARCHAR(7)"/>
+    </addColumn>
+
+    <dropColumn tableName="degree_programs" columnName="pin"/>
+
+    <addColumn tableName="degree_programs">
+      <column name="user_id" type="BIGINT">
+        <constraints foreignKeyName="fk_degree_programs_user" references="users(id)" unique="true"
+          nullable="false"/>
+      </column>
+    </addColumn>
+
+    <comment>Add pin column to user table</comment>
+  </changeSet>
+
+</databaseChangeLog>

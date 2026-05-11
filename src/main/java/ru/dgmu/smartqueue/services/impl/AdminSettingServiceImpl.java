@@ -7,24 +7,38 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.dgmu.smartqueue.controllers.DegreeProgramService;
+import ru.dgmu.smartqueue.dtos.DegreeProgramDto;
+import ru.dgmu.smartqueue.dtos.DegreeProgramDto.DegreeProgramPresentation;
 import ru.dgmu.smartqueue.dtos.ExcludedSlotSettingsDto;
 import ru.dgmu.smartqueue.dtos.PeriodSettingsDto;
 import ru.dgmu.smartqueue.dtos.SlotSettingsDto;
 import ru.dgmu.smartqueue.entites.AdminSetting;
+import ru.dgmu.smartqueue.entites.DegreeProgram;
+import ru.dgmu.smartqueue.entites.User;
 import ru.dgmu.smartqueue.enums.AdminSettingResourceEnum;
+import ru.dgmu.smartqueue.enums.Role;
+import ru.dgmu.smartqueue.exception.ApiError;
 import ru.dgmu.smartqueue.repositories.AdminSettingsRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
+import ru.dgmu.smartqueue.services.UserService;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AdminSettingServiceImpl implements AdminSettingService {
 
   private final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
   private final AdminSettingsRepository repository;
+  private final UserService userService;
+  private final DegreeProgramService degreeProgramService;
 
   @Override
   public PeriodSettingsDto getPeriodSettings() {
@@ -129,5 +143,24 @@ public class AdminSettingServiceImpl implements AdminSettingService {
         });
     list.removeIf(slot -> slot.id().equals(id));
     entity.setSettings(list);
+  }
+
+  @Override
+  @Transactional
+  public void createDegreeProgram(DegreeProgramDto degreeProgramDto) {
+    var user = userService.create(User.builder()
+        .username(UUID.randomUUID().toString())
+        .pin(degreeProgramDto.pin())
+        .isEnabled(Boolean.TRUE)
+        .role(Role.OPERATOR)
+        .build());
+    degreeProgramService.saveDegreeProgram(degreeProgramDto.toEntity(user));
+  }
+
+  @Override
+  public List<DegreeProgramPresentation> getAllDegreePrograms() {
+    return degreeProgramService.getDegreePrograms().stream()
+        .map(DegreeProgramDto::toPresentation)
+        .toList();
   }
 }

@@ -10,7 +10,6 @@ public record UserDto(
     String lastName,
     String username,
     String password,
-    String email,
     Boolean isEnabled,
     Role role
 ) {
@@ -26,7 +25,6 @@ public record UserDto(
         user.getLastName(),
         user.getUsername(),
         user.getPassword(),
-        user.getEmail(),
         user.isEnabled(),
         user.getRole()
     );
@@ -36,7 +34,6 @@ public record UserDto(
     return new UserContextPresentationDto(
         getFio(),
         username,
-        email,
         role.name()
     );
   }
@@ -54,7 +51,6 @@ public record UserDto(
   public record UserContextPresentationDto(
       String fio,
       String username,
-      String email,
       String role
   ) {
   }

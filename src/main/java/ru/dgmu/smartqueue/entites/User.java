@@ -51,9 +51,6 @@ public class User implements UserDetails {
   @Column(name = "password")
   private String password;
 
-  @Column(name = "email")
-  private String email;
-
   @JsonProperty("enabled")
   @Column(name = "is_enabled")
   private Boolean isEnabled;
@@ -61,6 +58,10 @@ public class User implements UserDetails {
   @Enumerated(EnumType.STRING)
   @Column(name = "role")
   private Role role;
+
+  @Column(name = "pin")
+  @JsonIgnore
+  private String pin;
 
   @JsonIgnore
   @Override

@@ -5,10 +5,18 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "degree_programs")
 public class DegreeProgram {
 
@@ -21,9 +29,10 @@ public class DegreeProgram {
   @Column(name = "name")
   private String name;
 
-  @Column(name = "pin")
-  private String pin;
-
   @Column(name = "description")
   private String description;
+
+  @JoinColumn(name = "user_id")
+  @OneToOne
+  private User userId;
 }

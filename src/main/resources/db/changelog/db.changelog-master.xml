@@ -7,4 +7,5 @@
   <include file="changelog/001.create_users_table.xml" relativeToChangelogFile="true"/>
   <include file="changelog/002.create_admin_settings_table.xml" relativeToChangelogFile="true"/>
   <include file="changelog/003.create_degree_program_and_slot_tables.xml" relativeToChangelogFile="true"/>
+  <include file="changelog/004.add_pin_to_user_table.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

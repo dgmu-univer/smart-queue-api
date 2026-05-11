@@ -3,10 +3,13 @@ package ru.dgmu.smartqueue.controllers;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,15 +17,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.dgmu.smartqueue.dtos.DegreeProgramDto;
+import ru.dgmu.smartqueue.dtos.DegreeProgramDto.DegreeProgramPresentation;
 import ru.dgmu.smartqueue.dtos.ExcludedSlotSettingsDto;
 import ru.dgmu.smartqueue.dtos.PeriodSettingsDto;
 import ru.dgmu.smartqueue.dtos.SlotSettingsDto;
+import ru.dgmu.smartqueue.exception.ApiError;
 import ru.dgmu.smartqueue.services.AdminSettingService;
 
 @RestController
 @RequestMapping("/admin-settings")
 @PreAuthorize(value = "hasAuthority('ADMIN')")
+@Slf4j
 @RequiredArgsConstructor
 public class AdminSettingController {
 
@@ -60,7 +68,8 @@ public class AdminSettingController {
   }
 
   @PutMapping("/non-working-days")
-  public ResponseEntity<List<LocalDate>> putNonWorkingDays(@RequestBody List<LocalDate> updatedNonWorkingDays) {
+  public ResponseEntity<List<LocalDate>> putNonWorkingDays(
+      @RequestBody List<LocalDate> updatedNonWorkingDays) {
     return ResponseEntity.ok(adminSettingService.updateNonWorkingDays(updatedNonWorkingDays));
   }
 
@@ -80,5 +89,24 @@ public class AdminSettingController {
   public ResponseEntity<Void> getExcluedeSlots(@PathVariable Long id) {
     adminSettingService.deleteExcludedSlot(id);
     return ResponseEntity.ok().build();
+  }
+
+  @GetMapping("/degree-programs")
+  public ResponseEntity<List<DegreeProgramPresentation>> getAllDegreePrograms() {
+    return ResponseEntity.ok(adminSettingService.getAllDegreePrograms());
+  }
+
+  @PostMapping("/degree-programs")
+  public ResponseEntity<Void> createDegreeProgram(@RequestBody DegreeProgramDto degreeProgramDto) {
+    adminSettingService.createDegreeProgram(degreeProgramDto);
+    return ResponseEntity.status(HttpStatus.CREATED).build();
+  }
+
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ResponseEntity<ApiError> handle(DataIntegrityViolationException e) {
+    log.error("Failed to create degree program", e);
+    return ResponseEntity.badRequest()
+        .body(new ApiError("Программа с таким названием уже существует"));
   }
 }

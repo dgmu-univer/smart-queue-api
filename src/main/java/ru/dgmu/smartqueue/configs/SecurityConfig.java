@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -63,13 +64,18 @@ public class SecurityConfig {
 
   @Bean
   public AuthenticationProvider authenticationProvider() {
-    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userService.userDetailsService());
+    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(
+        userService.userDetailsService());
     authProvider.setPasswordEncoder(passwordEncoder());
     return authProvider;
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
-    return config.getAuthenticationManager();
+  public AuthenticationManager authManager(HttpSecurity http, PinAuthenticationProvider pinProvider,
+      AuthenticationProvider authenticationProvider) {
+    return http.getSharedObject(AuthenticationManagerBuilder.class)
+        .authenticationProvider(pinProvider) // Для юзеров по PIN
+        .authenticationProvider(authenticationProvider) // Для админов по логину/паролю
+        .build();
   }
 }
