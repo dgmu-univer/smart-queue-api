@@ -13,7 +13,9 @@
     </preConditions>
 
     <addColumn tableName="users">
-      <column name="pin" type="VARCHAR(7)"/>
+      <column name="pin" type="VARCHAR(6)">
+        <constraints unique="true"/>
+      </column>
     </addColumn>
 
     <dropColumn tableName="degree_programs" columnName="pin"/>

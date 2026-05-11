@@ -14,7 +14,7 @@ public record DegreeProgramDto(
   }
 
   public DegreeProgram toEntity(User user) {
-    return new DegreeProgram(null, name, description, user);
+    return new DegreeProgram(name, description, user);
   }
 
   public static DegreeProgramDto fromEntity(DegreeProgram degreeProgram) {

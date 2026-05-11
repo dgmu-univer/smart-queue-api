@@ -2,8 +2,10 @@ package ru.dgmu.smartqueue.controllers;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.dgmu.smartqueue.dtos.DegreeProgramDto;
 import ru.dgmu.smartqueue.entites.DegreeProgram;
+import ru.dgmu.smartqueue.entites.User;
 import ru.dgmu.smartqueue.repositories.DegreeProgramRepository;
 
 @Service
@@ -23,5 +25,14 @@ public class DegreeProgramService {
 
   public void saveDegreeProgram(DegreeProgram degreeProgram) {
     degreeProgramRepository.save(degreeProgram);
+  }
+
+  public DegreeProgramDto findDegreeProgramByUserId(User user) {
+    return DegreeProgramDto.fromEntity(degreeProgramRepository.findByUserId(user));
+  }
+
+  @Transactional
+  public void deleteDegreeProgramByUserId(String id) {
+    degreeProgramRepository.deleteById(id);
   }
 }

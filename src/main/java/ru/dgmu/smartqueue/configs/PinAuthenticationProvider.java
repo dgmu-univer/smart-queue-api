@@ -2,7 +2,7 @@ package ru.dgmu.smartqueue.configs;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
@@ -18,9 +18,8 @@ public class PinAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication auth) throws AuthenticationException {
         String pin = (String) auth.getCredentials();
-        // Здесь ваша логика: поиск юзера в БД по PIN
         User user = userRepository.findByPin(pin)
-            .orElseThrow(() -> new BadCredentialsException("Неверный PIN"));
+            .orElseThrow(() -> new AuthorizationDeniedException("Access Denied"));
 
         return new PinAuthenticationToken(user, user.getAuthorities());
     }
