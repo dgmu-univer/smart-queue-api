@@ -158,10 +158,8 @@ public class AdminSettingServiceImpl implements AdminSettingService {
   }
 
   @Override
-  public List<DegreeProgramPresentation> getAllDegreePrograms() {
-    return degreeProgramService.getDegreePrograms().stream()
-        .map(DegreeProgramDto::toPresentation)
-        .toList();
+  public List<DegreeProgramDto> getAllDegreePrograms() {
+    return degreeProgramService.getDegreePrograms().stream().toList();
   }
   // todo убрать этот слой
   // todo связать слоты с направлением

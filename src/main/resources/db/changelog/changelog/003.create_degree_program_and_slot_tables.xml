@@ -12,15 +12,20 @@
       </not>
     </preConditions>
 
+    <createSequence sequenceName="degree_programs_id_seq" startValue="1" incrementBy="1"/>
+
     <createTable tableName="degree_programs">
-      <column name="name" type="VARCHAR(255)">
-        <constraints primaryKey="true" nullable="false" unique="true"/>
+      <column name="id" type="BIGINT" defaultValueComputed="nextval('degree_programs_id_seq')">
+        <constraints primaryKey="true" primaryKeyName="pk_degree_programs_id" nullable="false"/>
       </column>
-      <column name="pin" type="VARCHAR(6)">
+      <column name="name" type="VARCHAR(255)">
         <constraints nullable="false"/>
       </column>
       <column name="description" type="VARCHAR(255)">
         <constraints nullable="true"/>
+      </column>
+      <column name="pin" type="VARCHAR(6)">
+        <constraints nullable="false"/>
       </column>
     </createTable>
 
@@ -40,8 +45,8 @@
       <column name="id" type="BIGINT" defaultValueComputed="nextval('slot_id_seq')">
         <constraints primaryKey="true" primaryKeyName="pk_slots_id" nullable="false"/>
       </column>
-      <column name="degree_program_id" type="VARCHAR(255)">
-        <constraints nullable="false" references="degree_programs(name)"
+      <column name="degree_program_id" type="BIGINT">
+        <constraints nullable="false" references="degree_programs(id)"
           foreignKeyName="fk_slots_degree_program"/>
       </column>
       <column name="start_time_at" type="TIMESTAMP">

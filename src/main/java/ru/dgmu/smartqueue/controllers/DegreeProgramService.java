@@ -25,7 +25,7 @@ public class DegreeProgramService {
 
   @Transactional
   public void saveDegreeProgram(DegreeProgram degreeProgram) {
-    degreeProgramRepository.save(degreeProgram); // todo обноаляет
+    degreeProgramRepository.save(degreeProgram);
   }
 
   public DegreeProgramDto findDegreeProgramByUserId(User user) {

@@ -1,5 +1,6 @@
 package ru.dgmu.smartqueue.controllers;
 
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.dgmu.smartqueue.dtos.DegreeProgramDto;
-import ru.dgmu.smartqueue.dtos.DegreeProgramDto.DegreeProgramPresentation;
 import ru.dgmu.smartqueue.dtos.ExcludedSlotSettingsDto;
 import ru.dgmu.smartqueue.dtos.PeriodSettingsDto;
 import ru.dgmu.smartqueue.dtos.SlotSettingsDto;
@@ -92,12 +92,12 @@ public class AdminSettingController {
   }
 
   @GetMapping("/degree-programs")
-  public ResponseEntity<List<DegreeProgramPresentation>> getAllDegreePrograms() {
+  public ResponseEntity<List<DegreeProgramDto>> getAllDegreePrograms() {
     return ResponseEntity.ok(adminSettingService.getAllDegreePrograms());
   }
 
   @PostMapping("/degree-programs")
-  public ResponseEntity<Void> createDegreeProgram(@RequestBody DegreeProgramDto degreeProgramDto) {
+  public ResponseEntity<Void> createDegreeProgram(@RequestBody @Valid DegreeProgramDto degreeProgramDto) {
     adminSettingService.createDegreeProgram(degreeProgramDto);
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }

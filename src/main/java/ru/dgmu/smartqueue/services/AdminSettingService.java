@@ -30,5 +30,5 @@ public interface AdminSettingService {
 
   void createDegreeProgram(DegreeProgramDto degreeProgramDto);
 
-  List<DegreeProgramPresentation> getAllDegreePrograms();
+  List<DegreeProgramDto> getAllDegreePrograms();
 }
