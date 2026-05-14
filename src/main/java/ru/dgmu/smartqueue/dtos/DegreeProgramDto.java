@@ -29,7 +29,7 @@ public record DegreeProgramDto(
         degreeProgram.getId(),
         degreeProgram.getName(),
         degreeProgram.getDescription(),
-        null
+        degreeProgram.getUserId().getPin()
     );
   }
 

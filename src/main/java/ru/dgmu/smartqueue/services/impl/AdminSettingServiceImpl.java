@@ -159,7 +159,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
   @Override
   public List<DegreeProgramDto> getAllDegreePrograms() {
-    return degreeProgramService.getDegreePrograms().stream().toList();
+    return degreeProgramService.getDegreePrograms();
   }
   // todo убрать этот слой
   // todo связать слоты с направлением
