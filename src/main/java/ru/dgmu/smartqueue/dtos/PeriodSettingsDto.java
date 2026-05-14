@@ -1,6 +1,8 @@
 package ru.dgmu.smartqueue.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
 
@@ -27,8 +29,10 @@ public record PeriodSettingsDto(
   }
 
   public record Period(
-      @JsonProperty("start_date") String startDate,
-      @JsonProperty("end_date") String endDate
+      @JsonProperty("start_date")
+      LocalDate startDate,
+      @JsonProperty("end_date")
+      LocalDate endDate
   ) {
 
     public Period merge(Period patch) {
@@ -40,8 +44,8 @@ public record PeriodSettingsDto(
   }
 
   public record WorkingTime(
-      @JsonProperty("start_time") String startTime,
-      @JsonProperty("end_time") String endTime
+      @JsonProperty("start_time") LocalTime startTime,
+      @JsonProperty("end_time") LocalTime endTime
   ) {
 
     public WorkingTime merge(WorkingTime patch) {
@@ -53,8 +57,8 @@ public record PeriodSettingsDto(
   }
 
   public record Lunch(
-      @JsonProperty("start_time") String startTime,
-      @JsonProperty("end_time") String endTime
+      @JsonProperty("start_time") LocalTime startTime,
+      @JsonProperty("end_time") LocalTime endTime
   ) {
 
     public Lunch merge(Lunch patch) {

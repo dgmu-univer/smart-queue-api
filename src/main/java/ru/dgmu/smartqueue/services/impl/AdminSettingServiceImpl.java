@@ -163,4 +163,6 @@ public class AdminSettingServiceImpl implements AdminSettingService {
         .map(DegreeProgramDto::toPresentation)
         .toList();
   }
+  // todo убрать этот слой
+  // todo связать слоты с направлением
 }
