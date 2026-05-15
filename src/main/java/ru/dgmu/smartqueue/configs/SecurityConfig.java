@@ -9,7 +9,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -42,7 +41,7 @@ public class SecurityConfig {
         )
         .cors(cors -> cors.configurationSource(request -> {
           var corsConfiguration = new CorsConfiguration();
-          corsConfiguration.setAllowedOriginPatterns(List.of("*"));
+          corsConfiguration.setAllowedOriginPatterns(List.of("https://price05.ru")); // todo вынести в переменную
           corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
           corsConfiguration.setAllowedHeaders(List.of("*"));
           return corsConfiguration;
