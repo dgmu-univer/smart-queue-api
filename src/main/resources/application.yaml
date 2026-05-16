@@ -27,3 +27,5 @@ server:
     session:
       timeout: 3600m
       tracking-modes: cookie
+      cookie:
+        path: /
