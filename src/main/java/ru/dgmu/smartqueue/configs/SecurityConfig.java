@@ -37,6 +37,7 @@ public class SecurityConfig {
             .requestMatchers("/actuator/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/login").permitAll()
             .requestMatchers("/admin/**", "/swagger-ui/**").permitAll()
+            .requestMatchers("/error").permitAll()
             .anyRequest().authenticated()
         )
         .cors(cors -> cors.configurationSource(request -> {

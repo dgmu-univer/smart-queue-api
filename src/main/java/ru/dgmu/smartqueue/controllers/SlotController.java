@@ -22,8 +22,7 @@ public class SlotController {
   private final SlotService slotService;
 
   @GetMapping
-  public ResponseEntity<List<SlotDto>> getSlotsByFilter(@Valid SlotFilter filter,
-      @Valid SlotFilter filter) {
+  public ResponseEntity<List<SlotDto>> getSlotsByFilter(@Valid SlotFilter filter) {
     return ResponseEntity.ok(slotService.getSlotsByFilter(filter));
   }
 
