@@ -33,7 +33,7 @@ public class DegreeProgramService {
   }
 
   @Transactional
-  public void deleteDegreeProgramByUserId(String id) {
+  public void deleteDegreeProgramByUserId(Long id) {
     degreeProgramRepository.deleteById(id);
   }
 }
