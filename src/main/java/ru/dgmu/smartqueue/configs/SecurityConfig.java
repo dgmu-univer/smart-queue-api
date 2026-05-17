@@ -73,8 +73,8 @@ public class SecurityConfig {
   public AuthenticationManager authManager(HttpSecurity http, PinAuthenticationProvider pinProvider,
       AuthenticationProvider authenticationProvider) {
     return http.getSharedObject(AuthenticationManagerBuilder.class)
-        .authenticationProvider(pinProvider) // Для юзеров по PIN
-        .authenticationProvider(authenticationProvider) // Для админов по логину/паролю
+        .authenticationProvider(pinProvider)
+        .authenticationProvider(authenticationProvider)
         .build();
   }
 }
