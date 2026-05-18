@@ -1,5 +1,7 @@
 package ru.dgmu.smartqueue.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -21,12 +23,14 @@ import ru.dgmu.smartqueue.dtos.UserDto.UserContextPresentationDto;
 import ru.dgmu.smartqueue.entites.User;
 
 @RestController
+@Tag(name = "Admin login", description = "Аутентификация администратора")
 @RequiredArgsConstructor
 public class AuthController {
 
   private final AuthenticationManager authenticationManager;
 
   @PostMapping("/login")
+  @Operation(description = "Аутентификация администратора")
   public ResponseEntity<UserContextPresentationDto> login(
       @RequestBody SignInRequestDto request,
       HttpServletRequest httpRequest
@@ -58,6 +62,7 @@ public class AuthController {
   }
 
   @PostMapping("/logout")
+  @Operation(description = "Выход администратора")
   public void logout(HttpServletRequest request, HttpServletResponse response) {
     HttpSession session = request.getSession(false);
     if (session != null) {

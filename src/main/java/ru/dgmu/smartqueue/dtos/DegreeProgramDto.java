@@ -1,10 +1,12 @@
 package ru.dgmu.smartqueue.dtos;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import ru.dgmu.smartqueue.entites.DegreeProgram;
 import ru.dgmu.smartqueue.entites.User;
 
+@Schema(description = "Запрос на создание программы образовния")
 public record DegreeProgramDto(
     Long id,
     @NotBlank(message = "Наличие имени обязательно")
@@ -33,6 +35,7 @@ public record DegreeProgramDto(
     );
   }
 
+  @Schema(description = "Ответ с ифорацией оператора")
   public record DegreeProgramPresentation(
       Long id,
       String name,

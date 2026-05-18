@@ -1,5 +1,7 @@
 package ru.dgmu.smartqueue.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import ru.dgmu.smartqueue.entites.User;
 import ru.dgmu.smartqueue.services.DegreeProgramService;
 
 @RestController
+@Tag(name = "Operator login", description = "Аутентификация оператора")
 @RequiredArgsConstructor
 public class OperatorLoginController {
 
@@ -27,6 +30,7 @@ public class OperatorLoginController {
   private final DegreeProgramService degreeProgramService;
 
   @PostMapping("/operator/login")
+  @Operation(description = "Аутентификация оператора")
   public ResponseEntity<DegreeProgramPresentation> login(
       @RequestBody SignInOperatorDto request,
       HttpServletRequest httpRequest

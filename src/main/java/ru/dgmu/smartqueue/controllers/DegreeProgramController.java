@@ -1,5 +1,10 @@
 package ru.dgmu.smartqueue.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,6 +25,7 @@ import ru.dgmu.smartqueue.exception.ApiError;
 import ru.dgmu.smartqueue.services.DegreeProgramService;
 
 @RestController
+@Tag(name = "Degree programs", description = "Управление программами образовния")
 @RequestMapping("/degree-programs")
 public class DegreeProgramController {
 
@@ -35,6 +41,7 @@ public class DegreeProgramController {
     return ResponseEntity.ok(degreeProgramService.getDegreePrograms());
   }
 
+  @Operation(description = "Создание программы образования")
   @PostMapping
   @PreAuthorize(value = "hasAuthority('ADMIN')")
   public ResponseEntity<Void> createDegreeProgram(@RequestBody @Valid DegreeProgramDto degreeProgramDto) {
@@ -42,12 +49,14 @@ public class DegreeProgramController {
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
+  @Operation(description = "Удалить программу образования")
   @DeleteMapping("/{id}")
   @PreAuthorize(value = "hasAuthority('ADMIN')")
-  public void deleteDegreeProgramByUserId(@PathVariable Long id) {
+  public void deleteDegreeProgramByUserId(@PathVariable @Parameter(description = "ID", required = true) Long id) {
     degreeProgramService.deleteDegreeProgram(id);
   }
 
+  @Operation(description = "Получение всех программ с интервалом дат приема")
   @GetMapping("/public")
   public ResponseEntity<DegreeProgramsWithPeriodDto> getDegreePrograms() {
     return ResponseEntity.ok(degreeProgramService.getDegreeProgramsPresentations());

@@ -1,5 +1,8 @@
 package ru.dgmu.smartqueue.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -22,17 +25,20 @@ import ru.dgmu.smartqueue.services.SlotService;
 @RestController
 @RequestMapping("/slots")
 @RequiredArgsConstructor
+@Tag(name = "Slots", description = "Управление слотами")
 @Slf4j
 @Validated
 public class SlotController {
 
   private final SlotService slotService;
 
+  @Operation(description = "Получение списка слотов")
   @GetMapping
   public ResponseEntity<List<SlotDto>> getSlotsByFilter(@Valid SlotFilter filter) {
     return ResponseEntity.ok(slotService.getSlotsByFilter(filter));
   }
 
+  @Operation(description = "Создание сетки слотов по настройками администратора")
   @PostMapping
   public ResponseEntity<Void> createSlotsMesh(
       @RequestBody @Valid GenerateSlotsMeshRequest request) {
@@ -47,6 +53,7 @@ public class SlotController {
         .body(new ApiError("Указанная программа образования не найдена"));
   }
 
+  @Schema(description = "Фильтр для поиска слотов")
   public record SlotFilter(
       @RequestParam(required = false)
       Boolean booked,
@@ -58,6 +65,7 @@ public class SlotController {
 
   }
 
+  @Schema(description = "Запрос на создание сетки слотов для программы образования")
   public record GenerateSlotsMeshRequest(
       Long degreeProgramId
   ) {
