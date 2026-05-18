@@ -17,7 +17,7 @@ public record DegreeProgramDto(
 ) {
 
   public DegreeProgramPresentation toPresentation() {
-    return new DegreeProgramPresentation(name, description);
+    return new DegreeProgramPresentation(id, name, description);
   }
 
   public DegreeProgram toEntity(User user) {
@@ -34,6 +34,7 @@ public record DegreeProgramDto(
   }
 
   public record DegreeProgramPresentation(
+      Long id,
       String name,
       String description
   ) {

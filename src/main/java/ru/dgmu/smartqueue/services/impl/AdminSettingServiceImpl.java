@@ -37,8 +37,6 @@ public class AdminSettingServiceImpl implements AdminSettingService {
   private final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
   private final AdminSettingsRepository repository;
-  private final UserService userService;
-  private final DegreeProgramService degreeProgramService;
 
   @Override
   public PeriodSettingsDto getPeriodSettings() {
@@ -143,28 +141,6 @@ public class AdminSettingServiceImpl implements AdminSettingService {
         });
     list.removeIf(slot -> slot.id().equals(id));
     entity.setSettings(list);
-  }
-
-  @Override
-  @Transactional
-  public void createDegreeProgram(DegreeProgramDto degreeProgramDto) {
-    var user = userService.create(User.builder()
-        .username(UUID.randomUUID().toString())
-        .pin(degreeProgramDto.pin())
-        .isEnabled(Boolean.TRUE)
-        .role(Role.OPERATOR)
-        .build());
-    degreeProgramService.saveDegreeProgram(degreeProgramDto.toEntity(user));
-  }
-
-  @Override
-  public List<DegreeProgramDto> getAllDegreePrograms() {
-    return degreeProgramService.getDegreePrograms();
-  }
-
-  @Override
-  public void deleteDegreeProgram(Long id) {
-    degreeProgramService.deleteDegreeProgramByUserId(id);
   }
 
   // todo убрать этот слой

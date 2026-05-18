@@ -2,12 +2,20 @@ package ru.dgmu.smartqueue.services;
 
 import java.util.List;
 import ru.dgmu.smartqueue.dtos.DegreeProgramDto;
-import ru.dgmu.smartqueue.entites.DegreeProgram;
+import ru.dgmu.smartqueue.dtos.DegreeProgramsWithPeriodDto;
 import ru.dgmu.smartqueue.entites.User;
 
 public interface DegreeProgramService {
+
+  DegreeProgramsWithPeriodDto getDegreeProgramsPresentations();
+
   List<DegreeProgramDto> getDegreePrograms();
-  void saveDegreeProgram(DegreeProgram degreeProgram);
+
+  void createDegreeProgram(DegreeProgramDto degreeProgramDto);
+
   DegreeProgramDto findDegreeProgramByUserId(User user);
-  void deleteDegreeProgramByUserId(Long id);
+
+  void deleteDegreeProgram(Long id);
+
+
 }
