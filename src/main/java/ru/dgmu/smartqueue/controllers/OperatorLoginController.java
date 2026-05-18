@@ -17,6 +17,7 @@ import ru.dgmu.smartqueue.configs.PinAuthenticationToken;
 import ru.dgmu.smartqueue.dtos.DegreeProgramDto.DegreeProgramPresentation;
 import ru.dgmu.smartqueue.dtos.SignInOperatorDto;
 import ru.dgmu.smartqueue.entites.User;
+import ru.dgmu.smartqueue.services.DegreeProgramService;
 
 @RestController
 @RequiredArgsConstructor

@@ -47,7 +47,7 @@
       </column>
       <column name="degree_program_id" type="BIGINT">
         <constraints nullable="false" references="degree_programs(id)"
-          foreignKeyName="fk_slots_degree_program"/>
+          foreignKeyName="fk_slots_degree_program" deleteCascade="true"/>
       </column>
       <column name="start_time_at" type="TIMESTAMP">
         <constraints nullable="false"/>
