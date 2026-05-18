@@ -1,4 +1,4 @@
-package ru.dgmu.smartqueue.controllers;
+package ru.dgmu.smartqueue.services.impl;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -7,13 +7,14 @@ import ru.dgmu.smartqueue.dtos.DegreeProgramDto;
 import ru.dgmu.smartqueue.entites.DegreeProgram;
 import ru.dgmu.smartqueue.entites.User;
 import ru.dgmu.smartqueue.repositories.DegreeProgramRepository;
+import ru.dgmu.smartqueue.services.DegreeProgramService;
 
 @Service
-public class DegreeProgramService {
+public class DegreeProgramServiceImpl implements DegreeProgramService {
 
   private final DegreeProgramRepository degreeProgramRepository;
 
-  public DegreeProgramService(DegreeProgramRepository degreeProgramRepository) {
+  public DegreeProgramServiceImpl(DegreeProgramRepository degreeProgramRepository) {
     this.degreeProgramRepository = degreeProgramRepository;
   }
 

@@ -102,6 +102,11 @@ public class AdminSettingController {
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
+  @DeleteMapping("/degree-programs/{id}")
+  public void deleteDegreeProgramByUserId(@PathVariable Long id) {
+    adminSettingService.deleteDegreeProgram(id);
+  }
+
   @ExceptionHandler(DataIntegrityViolationException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public ResponseEntity<ApiError> handle(DataIntegrityViolationException e) {

@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.dgmu.smartqueue.controllers.DegreeProgramService;
 import ru.dgmu.smartqueue.dtos.DegreeProgramDto;
 import ru.dgmu.smartqueue.dtos.DegreeProgramDto.DegreeProgramPresentation;
 import ru.dgmu.smartqueue.dtos.ExcludedSlotSettingsDto;
@@ -27,6 +26,7 @@ import ru.dgmu.smartqueue.enums.Role;
 import ru.dgmu.smartqueue.exception.ApiError;
 import ru.dgmu.smartqueue.repositories.AdminSettingsRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
+import ru.dgmu.smartqueue.services.DegreeProgramService;
 import ru.dgmu.smartqueue.services.UserService;
 
 @Service
@@ -161,6 +161,12 @@ public class AdminSettingServiceImpl implements AdminSettingService {
   public List<DegreeProgramDto> getAllDegreePrograms() {
     return degreeProgramService.getDegreePrograms();
   }
+
+  @Override
+  public void deleteDegreeProgram(Long id) {
+    degreeProgramService.deleteDegreeProgramByUserId(id);
+  }
+
   // todo убрать этот слой
   // todo связать слоты с направлением
 }

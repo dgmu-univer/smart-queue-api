@@ -31,4 +31,6 @@ public interface AdminSettingService {
   void createDegreeProgram(DegreeProgramDto degreeProgramDto);
 
   List<DegreeProgramDto> getAllDegreePrograms();
+
+  void deleteDegreeProgram(Long id);
 }
