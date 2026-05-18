@@ -36,7 +36,8 @@ public class SecurityConfig {
             .requestMatchers("/public/**").permitAll()
             .requestMatchers("/actuator/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/login").permitAll()
-            .requestMatchers("/admin/**", "/swagger-ui/**").permitAll()
+            .requestMatchers("/admin/**", "/swagger-ui.html", "/v3/**", "/swagger-ui/**").permitAll()
+            .requestMatchers("/error").permitAll()
             .anyRequest().authenticated()
         )
         .cors(cors -> cors.configurationSource(request -> {
@@ -72,8 +73,8 @@ public class SecurityConfig {
   public AuthenticationManager authManager(HttpSecurity http, PinAuthenticationProvider pinProvider,
       AuthenticationProvider authenticationProvider) {
     return http.getSharedObject(AuthenticationManagerBuilder.class)
-        .authenticationProvider(pinProvider) // Для юзеров по PIN
-        .authenticationProvider(authenticationProvider) // Для админов по логину/паролю
+        .authenticationProvider(pinProvider)
+        .authenticationProvider(authenticationProvider)
         .build();
   }
 }

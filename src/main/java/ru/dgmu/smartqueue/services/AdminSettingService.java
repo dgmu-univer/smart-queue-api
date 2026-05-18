@@ -2,8 +2,6 @@ package ru.dgmu.smartqueue.services;
 
 import java.time.LocalDate;
 import java.util.List;
-import ru.dgmu.smartqueue.dtos.DegreeProgramDto;
-import ru.dgmu.smartqueue.dtos.DegreeProgramDto.DegreeProgramPresentation;
 import ru.dgmu.smartqueue.dtos.ExcludedSlotSettingsDto;
 import ru.dgmu.smartqueue.dtos.PeriodSettingsDto;
 import ru.dgmu.smartqueue.dtos.SlotSettingsDto;
@@ -27,8 +25,4 @@ public interface AdminSettingService {
   void createExcludedSlot(ExcludedSlotSettingsDto excludedSlotSettingsDto);
 
   void deleteExcludedSlot(Long id);
-
-  void createDegreeProgram(DegreeProgramDto degreeProgramDto);
-
-  List<DegreeProgramDto> getAllDegreePrograms();
 }

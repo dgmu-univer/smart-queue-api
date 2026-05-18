@@ -1,5 +1,6 @@
 package ru.dgmu.smartqueue.dtos;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import ru.dgmu.smartqueue.entites.User;
 import ru.dgmu.smartqueue.enums.Role;
 
@@ -48,6 +49,7 @@ public record UserDto(
     return lastName != null;
   }
 
+  @Schema(description = "Ответ с информацией пользователя")
   public record UserContextPresentationDto(
       String fio,
       String username,

@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.dgmu.smartqueue.controllers.DegreeProgramService;
 import ru.dgmu.smartqueue.dtos.DegreeProgramDto;
 import ru.dgmu.smartqueue.dtos.DegreeProgramDto.DegreeProgramPresentation;
 import ru.dgmu.smartqueue.dtos.ExcludedSlotSettingsDto;
@@ -27,6 +26,7 @@ import ru.dgmu.smartqueue.enums.Role;
 import ru.dgmu.smartqueue.exception.ApiError;
 import ru.dgmu.smartqueue.repositories.AdminSettingsRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
+import ru.dgmu.smartqueue.services.DegreeProgramService;
 import ru.dgmu.smartqueue.services.UserService;
 
 @Service
@@ -37,8 +37,6 @@ public class AdminSettingServiceImpl implements AdminSettingService {
   private final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
   private final AdminSettingsRepository repository;
-  private final UserService userService;
-  private final DegreeProgramService degreeProgramService;
 
   @Override
   public PeriodSettingsDto getPeriodSettings() {
@@ -145,22 +143,6 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     entity.setSettings(list);
   }
 
-  @Override
-  @Transactional
-  public void createDegreeProgram(DegreeProgramDto degreeProgramDto) {
-    var user = userService.create(User.builder()
-        .username(UUID.randomUUID().toString())
-        .pin(degreeProgramDto.pin())
-        .isEnabled(Boolean.TRUE)
-        .role(Role.OPERATOR)
-        .build());
-    degreeProgramService.saveDegreeProgram(degreeProgramDto.toEntity(user));
-  }
-
-  @Override
-  public List<DegreeProgramDto> getAllDegreePrograms() {
-    return degreeProgramService.getDegreePrograms();
-  }
   // todo убрать этот слой
   // todo связать слоты с направлением
 }
