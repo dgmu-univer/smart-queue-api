@@ -23,7 +23,6 @@ import ru.dgmu.smartqueue.exception.ApiError;
 import ru.dgmu.smartqueue.services.SlotService;
 
 @RestController
-@RequestMapping("/slots")
 @RequiredArgsConstructor
 @Tag(name = "Slots", description = "Управление слотами")
 @Slf4j
@@ -33,13 +32,13 @@ public class SlotController {
   private final SlotService slotService;
 
   @Operation(description = "Получение списка слотов")
-  @GetMapping
+  @GetMapping("/public/slots")
   public ResponseEntity<List<SlotDto>> getSlotsByFilter(@Valid SlotFilter filter) {
     return ResponseEntity.ok(slotService.getSlotsByFilter(filter));
   }
 
   @Operation(description = "Создание сетки слотов по настройками администратора")
-  @PostMapping
+  @PostMapping("/slots")
   public ResponseEntity<Void> createSlotsMesh(
       @RequestBody @Valid GenerateSlotsMeshRequest request) {
     slotService.generateServiceMesh(request.degreeProgramId());
