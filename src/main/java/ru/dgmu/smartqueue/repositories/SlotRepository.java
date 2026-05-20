@@ -3,10 +3,11 @@ package ru.dgmu.smartqueue.repositories;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.dgmu.smartqueue.controllers.SlotController.SlotFilter;
+import ru.dgmu.smartqueue.entites.DegreeProgram;
 import ru.dgmu.smartqueue.entites.Slot;
 
 @Repository
@@ -29,4 +30,12 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
       @Param("isBooked") boolean isBooked,
       @Param("slotCapacity") int slotCapacity
   );
+
+
+  @Modifying
+  @Query("""
+          DELETE FROM Slot s
+          WHERE s.degreeProgram.id = :degreeId
+      """)
+  void deleteAllByDegreeProgram(@Param("degreeId") Long degreeId);
 }

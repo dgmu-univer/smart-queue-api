@@ -80,6 +80,7 @@ public class SlotService {
           .map(slotDto -> slotDto.toEntity(degreeProgram))
           .toList();
 
+      slotRepository.deleteAllByDegreeProgram(degreeProgram.getId());
       slotRepository.saveAll(slots);
 
       log.info("Successfully generated {} slots for degree program ID: {}",

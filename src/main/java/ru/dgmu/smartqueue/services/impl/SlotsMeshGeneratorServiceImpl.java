@@ -41,12 +41,14 @@ public class SlotsMeshGeneratorServiceImpl {
           break;
         }
 
-        boolean intersectsWithLunch =
-            currentTime.isBefore(lunch.getEndTime()) && slotEnd.isAfter(lunch.getStartTime());
+        if (lunch != null && lunch.getStartTime() != null && lunch.getEndTime() != null) {
+          boolean intersectsWithLunch =
+              currentTime.isBefore(lunch.getEndTime()) && slotEnd.isAfter(lunch.getStartTime());
 
-        if (intersectsWithLunch) {
-          currentTime = lunch.getEndTime();
-          continue;
+          if (intersectsWithLunch) {
+            currentTime = lunch.getEndTime();
+            continue;
+          }
         }
 
         final LocalTime current = currentTime;
