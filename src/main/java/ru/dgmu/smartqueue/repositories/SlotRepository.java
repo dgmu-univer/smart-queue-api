@@ -40,7 +40,7 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
   @Modifying
   @Query("""
           DELETE FROM Slot s
-          WHERE s.degreeProgram.id = :degreeId
+          WHERE s.degreeProgram.id = :degreeId AND s.id NOT IN (:slotsWithAppointments)
       """)
-  void deleteAllByDegreeProgram(@Param("degreeId") Long degreeId);
+  void deleteAllByDegreeProgram(@Param("degreeId") Long degreeId, List<Long> slotsWithAppointments);
 }

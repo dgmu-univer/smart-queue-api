@@ -40,7 +40,7 @@ public class SlotGenerationServiceImpl implements SlotGenerationService {
       var slotsWithAppointments = slotRepository.findSlotsWithAppointments(degreeProgram.getId());
       var slots = generateSlotsForDegreeProgram(periodSettings, slotSettings, nonWorkingDays,
           excludedSlots, degreeProgram, slotsWithAppointments);
-      slotRepository.deleteAllByDegreeProgram(degreeProgram.getId());
+      slotRepository.deleteAllByDegreeProgram(degreeProgram.getId(), slotsWithAppointments.stream().map(Slot::getId).toList());
       slotRepository.saveAll(slots);
     });
   }
