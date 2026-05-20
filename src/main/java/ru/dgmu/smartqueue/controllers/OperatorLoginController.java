@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.dgmu.smartqueue.configs.PinAuthenticationToken;
-import ru.dgmu.smartqueue.dtos.DegreeProgramDto.DegreeProgramPresentation;
+import ru.dgmu.smartqueue.dtos.OperatorLoginSuccessDto;
 import ru.dgmu.smartqueue.dtos.SignInOperatorDto;
 import ru.dgmu.smartqueue.entites.User;
-import ru.dgmu.smartqueue.services.DegreeProgramService;
+import ru.dgmu.smartqueue.services.OperatorLoginService;
 
 @RestController
 @Tag(name = "Operator login", description = "Аутентификация оператора")
@@ -27,11 +27,11 @@ import ru.dgmu.smartqueue.services.DegreeProgramService;
 public class OperatorLoginController {
 
   private final AuthenticationManager authenticationManager;
-  private final DegreeProgramService degreeProgramService;
+  private final OperatorLoginService operatorLoginService;
 
   @PostMapping("/operator/login")
   @Operation(description = "Аутентификация оператора")
-  public ResponseEntity<DegreeProgramPresentation> login(
+  public ResponseEntity<OperatorLoginSuccessDto> login(
       @RequestBody SignInOperatorDto request,
       HttpServletRequest httpRequest
   ) {
@@ -58,8 +58,6 @@ public class OperatorLoginController {
 
     User user = (User) authentication.getPrincipal();
 
-    var degreeProgramByUserId = degreeProgramService.findDegreeProgramByUserId(user);
-
-    return ResponseEntity.ok(degreeProgramByUserId.toPresentation());
+    return ResponseEntity.ok(operatorLoginService.login(user));
   }
 }
