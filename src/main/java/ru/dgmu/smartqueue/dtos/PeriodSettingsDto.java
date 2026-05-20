@@ -1,72 +1,47 @@
 package ru.dgmu.smartqueue.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Optional;
-import java.util.function.BinaryOperator;
 
-public record PeriodSettingsDto(
-    @JsonProperty("work_date") Period workDate,
-    @JsonProperty("work_time") WorkingTime workTime,
-    @JsonProperty("lunch") Lunch lunch
-) {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class PeriodSettingsDto {
 
-  public PeriodSettingsDto merge(PeriodSettingsDto patch) {
-    return new PeriodSettingsDto(
-        mergeOptional(this.workDate, patch.workDate, Period::merge),
-        mergeOptional(this.workTime, patch.workTime, WorkingTime::merge),
-        mergeOptional(this.lunch, patch.lunch, Lunch::merge)
-    );
+  @JsonProperty("work_date")
+  private Period workDate;
+
+  @JsonProperty("work_time")
+  private WorkingTime workTime;
+
+  @JsonProperty("lunch")
+  private Lunch lunch;
+
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Period {
+    @JsonProperty("start_date") private LocalDate startDate;
+    @JsonProperty("end_date") private LocalDate endDate;
   }
 
-  private <T> T mergeOptional(T current, T patch, BinaryOperator<T> mergerFunction) {
-    return Optional.ofNullable(patch)
-        .map(p -> Optional.ofNullable(current)
-            .map(c -> mergerFunction.apply(c, p))
-            .orElse(p))
-        .orElse(current);
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class WorkingTime {
+    @JsonProperty("start_time") private LocalTime startTime;
+    @JsonProperty("end_time") private LocalTime endTime;
   }
 
-  public record Period(
-      @JsonProperty("start_date")
-      LocalDate startDate,
-      @JsonProperty("end_date")
-      LocalDate endDate
-  ) {
-
-    public Period merge(Period patch) {
-      return new Period(
-          patch.startDate() != null ? patch.startDate() : this.startDate(),
-          patch.endDate() != null ? patch.endDate() : this.endDate()
-      );
-    }
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Lunch {
+    @JsonProperty("start_time") private LocalTime startTime;
+    @JsonProperty("end_time") private LocalTime endTime;
   }
-
-  public record WorkingTime(
-      @JsonProperty("start_time") LocalTime startTime,
-      @JsonProperty("end_time") LocalTime endTime
-  ) {
-
-    public WorkingTime merge(WorkingTime patch) {
-      return new WorkingTime(
-          patch.startTime() != null ? patch.startTime() : this.startTime(),
-          patch.endTime() != null ? patch.endTime() : this.endTime()
-      );
-    }
-  }
-
-  public record Lunch(
-      @JsonProperty("start_time") LocalTime startTime,
-      @JsonProperty("end_time") LocalTime endTime
-  ) {
-
-    public Lunch merge(Lunch patch) {
-      return new Lunch(
-          patch.startTime() != null ? patch.startTime() : this.startTime(),
-          patch.endTime() != null ? patch.endTime() : this.endTime()
-      );
-    }
-  }
-
 }

@@ -1,5 +1,6 @@
 package ru.dgmu.smartqueue.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.LocalDate;
 import java.util.List;
 import ru.dgmu.smartqueue.dtos.ExcludedSlotSettingsDto;
@@ -10,7 +11,7 @@ public interface AdminSettingService {
 
   PeriodSettingsDto getPeriodSettings();
 
-  void updatePeriodSettings(PeriodSettingsDto updatedPeriodSettingsDto);
+  void updatePeriodSettings(String jsonPatch) throws JsonProcessingException;
 
   SlotSettingsDto getSlotSettings();
 

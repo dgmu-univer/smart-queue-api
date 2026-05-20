@@ -1,5 +1,7 @@
 package ru.dgmu.smartqueue.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -39,6 +41,7 @@ import ru.dgmu.smartqueue.services.AdminSettingService;
 @SecurityRequirement(name = "bearerAuth")
 public class AdminSettingController {
 
+  private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
   private final AdminSettingService adminSettingService;
 
   @GetMapping("/periods")
@@ -63,12 +66,9 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "401", description = "Не авторизован"),
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
-  public ResponseEntity<Void> patchPeriodSettings(
-      @RequestBody @Valid @Parameter(description = "Обновленные настройки периода", required = true)
-      PeriodSettingsDto updatedPeriodSettingsDto) {
-    log.info("Updating period settings");
-    adminSettingService.updatePeriodSettings(updatedPeriodSettingsDto);
-    log.info("Period settings updated successfully");
+  public ResponseEntity<Void> patchPeriodSettings(@RequestBody String jsonPatch)
+      throws JsonProcessingException {
+    adminSettingService.updatePeriodSettings(jsonPatch);
     return ResponseEntity.ok().build();
   }
 
