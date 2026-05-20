@@ -19,7 +19,7 @@ public interface AdminSettingService {
 
   List<LocalDate> getNonWorkingDays();
 
-  List<LocalDate> updateNonWorkingDays(List<LocalDate> updatedNonWorkingDays);
+  void updateNonWorkingDays(List<LocalDate> updatedNonWorkingDays);
 
   List<ExcludedSlotSettingsDto> getExcludedSlots();
 

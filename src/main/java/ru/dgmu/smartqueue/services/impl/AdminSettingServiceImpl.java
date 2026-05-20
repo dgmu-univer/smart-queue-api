@@ -19,6 +19,7 @@ import ru.dgmu.smartqueue.entites.AdminSetting;
 import ru.dgmu.smartqueue.enums.AdminSettingResourceEnum;
 import ru.dgmu.smartqueue.repositories.AdminSettingsRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
+import ru.dgmu.smartqueue.services.SlotGenerationService;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,8 @@ public class AdminSettingServiceImpl implements AdminSettingService {
   private final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
   private final AdminSettingsRepository repository;
+//  private final SlotService slotService;
+  private final SlotGenerationService slotGenerationService;
 
   @Override
   public PeriodSettingsDto getPeriodSettings() {
@@ -45,6 +48,8 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     AdminSetting entity = repository.findById(AdminSettingResourceEnum.PERIODS)
         .orElseThrow(() -> new EntityNotFoundException("Period settings not found"));
     entity.setSettings(updatedSettings);
+    repository.save(entity);
+    regenerageUnbookedSlots();
   }
 
   @Override
@@ -62,6 +67,8 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     SlotSettingsDto current = mapper.convertValue(entity.getSettings(), SlotSettingsDto.class);
     SlotSettingsDto merged = current.merge(updatedSlotSettingsDto);
     entity.setSettings(merged);
+    repository.save(entity);
+    regenerageUnbookedSlots();
   }
 
   @Override
@@ -75,11 +82,12 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
   @Override
   @Transactional
-  public List<LocalDate> updateNonWorkingDays(List<LocalDate> updatedNonWorkingDays) {
+  public void updateNonWorkingDays(List<LocalDate> updatedNonWorkingDays) {
     AdminSetting entity = repository.findById(AdminSettingResourceEnum.NON_WORKING_DAYS)
         .orElseThrow(() -> new EntityNotFoundException("Non working days settings not found"));
     entity.setSettings(updatedNonWorkingDays);
-    return List.of();
+    repository.save(entity);
+    regenerageUnbookedSlots();
   }
 
   @Override
@@ -116,6 +124,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
     entity.setSettings(list);
     repository.save(entity);
+    regenerageUnbookedSlots();
   }
 
   @Override
@@ -133,7 +142,20 @@ public class AdminSettingServiceImpl implements AdminSettingService {
         });
     list.removeIf(slot -> slot.id().equals(id));
     entity.setSettings(list);
+    repository.save(entity);
+
+    regenerageUnbookedSlots();
   }
+
+  public void regenerageUnbookedSlots() {
+    var periodSettings = getPeriodSettings();
+    var slotSettings = getSlotSettings();
+    var nonWorkingDays = getNonWorkingDays();
+    var excludedSlots = getExcludedSlots();
+    slotGenerationService.generateAndSaveWithSkipBooked(periodSettings, slotSettings,
+        nonWorkingDays, excludedSlots);
+  }
+
 
   // todo убрать этот слой
   // todo связать слоты с направлением

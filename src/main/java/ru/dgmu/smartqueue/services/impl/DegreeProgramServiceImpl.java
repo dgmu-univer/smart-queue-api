@@ -2,6 +2,7 @@ package ru.dgmu.smartqueue.services.impl;
 
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dgmu.smartqueue.dtos.DegreeProgramDto;
@@ -14,27 +15,26 @@ import ru.dgmu.smartqueue.enums.Role;
 import ru.dgmu.smartqueue.repositories.DegreeProgramRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
 import ru.dgmu.smartqueue.services.DegreeProgramService;
+import ru.dgmu.smartqueue.services.SlotGenerationService;
 import ru.dgmu.smartqueue.services.UserService;
 
 @Service
+@RequiredArgsConstructor
 public class DegreeProgramServiceImpl implements DegreeProgramService {
 
+  private final DegreeProgramRepository degreeProgramRepository;
+  private final AdminSettingService adminSettingService;
+  private final SlotGenerationService slotGenerationService;
+  private final UserService userService;
+
+  @Override
+  @Transactional(readOnly = true)
   public DegreeProgramDto findDegreeProgramByUserId(User user) {
     return DegreeProgramDto.fromEntity(degreeProgramRepository.findByUserId(user));
   }
 
-  private final DegreeProgramRepository degreeProgramRepository;
-  private final AdminSettingService adminSettingService;
-  private final UserService userService;
-
-  public DegreeProgramServiceImpl(DegreeProgramRepository degreeProgramRepository,
-      AdminSettingService adminSettingService, UserService userService) {
-    this.degreeProgramRepository = degreeProgramRepository;
-    this.adminSettingService = adminSettingService;
-    this.userService = userService;
-  }
-
   @Override
+  @Transactional(readOnly = true)
   public DegreeProgramsWithPeriodDto getDegreeProgramsPresentations() {
     List<DegreeProgramPresentation> degreePresantations = degreeProgramRepository.findAll().stream()
         .map(DegreeProgramDto::fromEntity)
@@ -45,6 +45,8 @@ public class DegreeProgramServiceImpl implements DegreeProgramService {
     return new DegreeProgramsWithPeriodDto(degreePresantations, periodSettings.getWorkDate());
   }
 
+  @Override
+  @Transactional(readOnly = true)
   public List<DegreeProgramDto> getDegreePrograms() {
     return degreeProgramRepository.findAll().stream()
         .map(DegreeProgramDto::fromEntity)
@@ -60,10 +62,21 @@ public class DegreeProgramServiceImpl implements DegreeProgramService {
         .isEnabled(Boolean.TRUE)
         .role(Role.OPERATOR)
         .build());
-    degreeProgramRepository.save(degreeProgramDto.toEntity(user));
+    var degreeProgram = degreeProgramRepository.save(degreeProgramDto.toEntity(user));
+    createSlots(degreeProgram);
+  }
+
+  private void createSlots(DegreeProgram degreeProgram) {
+    var periodSettings = adminSettingService.getPeriodSettings();
+    var slotSettings = adminSettingService.getSlotSettings();
+    var nonWorkingDays = adminSettingService.getNonWorkingDays();
+    var excludedSlots = adminSettingService.getExcludedSlots();
+    slotGenerationService.generateAndSaveNewDegree(periodSettings, slotSettings,
+        nonWorkingDays, excludedSlots, degreeProgram);
   }
 
   @Override
+  @Transactional
   public void deleteDegreeProgram(Long id) {
     degreeProgramRepository.deleteById(id);
   }

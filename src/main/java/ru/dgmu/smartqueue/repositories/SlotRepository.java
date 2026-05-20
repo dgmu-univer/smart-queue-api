@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.dgmu.smartqueue.entites.DegreeProgram;
 import ru.dgmu.smartqueue.entites.Slot;
 
 @Repository
@@ -30,6 +29,12 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
       @Param("isBooked") boolean isBooked,
       @Param("slotCapacity") int slotCapacity
   );
+
+  // todo добавить даты из настроек периода
+  @Query("""
+    SELECT s FROM Slot s JOIN FETCH s.appointments WHERE s.degreeProgram.id = :degreeProgramId 
+    """)
+  List<Slot> findSlotsWithAppointments(Long degreeProgramId);
 
 
   @Modifying

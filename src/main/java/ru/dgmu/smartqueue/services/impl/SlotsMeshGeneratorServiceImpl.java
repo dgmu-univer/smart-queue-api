@@ -10,18 +10,26 @@ import ru.dgmu.smartqueue.dtos.ExcludedSlotSettingsDto;
 import ru.dgmu.smartqueue.dtos.PeriodSettingsDto;
 import ru.dgmu.smartqueue.dtos.SlotDto;
 import ru.dgmu.smartqueue.dtos.SlotSettingsDto;
+import ru.dgmu.smartqueue.entites.Slot;
 
 public class SlotsMeshGeneratorServiceImpl {
 
   public List<SlotDto> generate(PeriodSettingsDto periodSettings, SlotSettingsDto slotSettings,
-      List<LocalDate> nonWorkingDays, List<ExcludedSlotSettingsDto> excludedSlots, Long degreeProgramId) {
+      List<LocalDate> nonWorkingDays, List<ExcludedSlotSettingsDto> excludedSlots,
+      List<Slot> hadAppointmentsSlots) {
     var workDate = periodSettings.getWorkDate();
     var workTime = periodSettings.getWorkTime();
     var lunch = periodSettings.getLunch();
 
     List<SlotDto> generatedSlots = new ArrayList<>();
+
+    // Группируем исключения по датам для быстрой проверки
     var exclusionsByDate = excludedSlots.stream()
         .collect(Collectors.groupingBy(dto -> LocalDate.parse(dto.date())));
+
+    // Группируем занятые слоты по датам (избегаем O(N) перебора для каждого минутного шага)
+    var appointmentsByDate = hadAppointmentsSlots.stream()
+        .collect(Collectors.groupingBy(slot -> slot.getStartTimeAt().toLocalDate()));
 
     for (LocalDate date = workDate.getStartDate(); !date.isAfter(workDate.getEndDate());
         date = date.plusDays(1)) {
@@ -31,6 +39,9 @@ public class SlotsMeshGeneratorServiceImpl {
 
       List<ExcludedSlotSettingsDto> dailyExclusions = exclusionsByDate.getOrDefault(date,
           List.of());
+
+      // Достаем занятые слоты конкретно для текущего дня расписания
+      List<Slot> dailyAppointments = appointmentsByDate.getOrDefault(date, List.of());
 
       LocalTime currentTime = workTime.getStartTime();
 
@@ -54,13 +65,22 @@ public class SlotsMeshGeneratorServiceImpl {
         final LocalTime current = currentTime;
         final LocalTime end = slotEnd;
 
+        // 1. Проверка пересечения с административными исключениями
         boolean intersectsWithExclusion = dailyExclusions.stream().anyMatch(ex -> {
           LocalTime exStart = LocalTime.parse(ex.startTime());
           LocalTime exEnd = LocalTime.parse(ex.endTime());
           return current.isBefore(exEnd) && end.isAfter(exStart);
         });
 
-        if (!intersectsWithExclusion) {
+        // 2. Проверка пересечения со слотами, на которые уже записаны люди
+        boolean intersectsWithAppointment = dailyAppointments.stream().anyMatch(slot -> {
+          LocalTime appStart = slot.getStartTimeAt().toLocalTime();
+          LocalTime appEnd = slot.getEndTimeAt().toLocalTime();
+          return current.isBefore(appEnd) && end.isAfter(appStart);
+        });
+
+        // Слот валиден, только если нет пересечений ни с исключениями, ни с записями
+        if (!intersectsWithExclusion && !intersectsWithAppointment) {
           SlotDto slot = new SlotDto(
               null,
               LocalDateTime.of(date, currentTime),
@@ -71,6 +91,7 @@ public class SlotsMeshGeneratorServiceImpl {
 
           currentTime = slotEnd;
         } else {
+          // Если пересечение найдено, делаем шаг в 1 минуту для поиска ближайшего окна
           currentTime = currentTime.plusMinutes(1);
         }
       }
