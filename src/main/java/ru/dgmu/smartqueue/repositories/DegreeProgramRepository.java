@@ -7,5 +7,6 @@ import ru.dgmu.smartqueue.entites.User;
 
 @Repository
 public interface DegreeProgramRepository extends JpaRepository<DegreeProgram, Long> {
+
   DegreeProgram findByUserId(User user);
 }

@@ -6,7 +6,8 @@ import ru.dgmu.smartqueue.entites.AdminSetting;
 import ru.dgmu.smartqueue.enums.AdminSettingResourceEnum;
 
 @Repository
-public interface AdminSettingsRepository extends JpaRepository<AdminSetting, AdminSettingResourceEnum> {
+public interface AdminSettingsRepository extends
+    JpaRepository<AdminSetting, AdminSettingResourceEnum> {
 
 //  List<AdminSetting> findByResource(AdminSettingResourceEnum resource);
 //  List<>

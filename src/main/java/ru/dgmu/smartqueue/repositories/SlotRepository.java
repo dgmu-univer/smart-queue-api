@@ -32,8 +32,8 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
 
   // todo добавить даты из настроек периода
   @Query("""
-    SELECT s FROM Slot s JOIN FETCH s.appointments WHERE s.degreeProgram.id = :degreeProgramId 
-    """)
+      SELECT s FROM Slot s JOIN FETCH s.appointments WHERE s.degreeProgram.id = :degreeProgramId 
+      """)
   List<Slot> findSlotsWithAppointments(Long degreeProgramId);
 
 

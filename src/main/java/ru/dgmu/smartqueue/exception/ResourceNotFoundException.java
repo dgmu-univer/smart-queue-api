@@ -5,11 +5,11 @@ package ru.dgmu.smartqueue.exception;
  */
 public class ResourceNotFoundException extends BusinessException {
 
-    public ResourceNotFoundException(String message) {
-        super(message);
-    }
+  public ResourceNotFoundException(String message) {
+    super(message);
+  }
 
-    public ResourceNotFoundException(String resourceType, Object id) {
-        super(String.format("%s с ID %s не найден", resourceType, id));
-    }
+  public ResourceNotFoundException(String resourceType, Object id) {
+    super(String.format("%s с ID %s не найден", resourceType, id));
+  }
 }

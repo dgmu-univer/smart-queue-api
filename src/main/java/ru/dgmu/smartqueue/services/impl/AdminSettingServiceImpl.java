@@ -29,7 +29,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
   private final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
   private final AdminSettingsRepository repository;
-//  private final SlotService slotService;
+  //  private final SlotService slotService;
   private final SlotGenerationService slotGenerationService;
 
   @Override
@@ -155,7 +155,6 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     slotGenerationService.generateAndSaveWithSkipBooked(periodSettings, slotSettings,
         nonWorkingDays, excludedSlots);
   }
-
 
   // todo убрать этот слой
   // todo связать слоты с направлением

@@ -13,19 +13,19 @@ import ru.dgmu.smartqueue.repositories.UserRepository;
 @RequiredArgsConstructor
 public class PinAuthenticationProvider implements AuthenticationProvider {
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    @Override
-    public Authentication authenticate(Authentication auth) throws AuthenticationException {
-        String pin = (String) auth.getCredentials();
-        User user = userRepository.findByPin(pin)
-            .orElseThrow(() -> new AuthorizationDeniedException("Access Denied"));
+  @Override
+  public Authentication authenticate(Authentication auth) throws AuthenticationException {
+    String pin = (String) auth.getCredentials();
+    User user = userRepository.findByPin(pin)
+        .orElseThrow(() -> new AuthorizationDeniedException("Access Denied"));
 
-        return new PinAuthenticationToken(user, user.getAuthorities());
-    }
+    return new PinAuthenticationToken(user, user.getAuthorities());
+  }
 
-    @Override
-    public boolean supports(Class<?> auth) {
-        return PinAuthenticationToken.class.isAssignableFrom(auth);
-    }
+  @Override
+  public boolean supports(Class<?> auth) {
+    return PinAuthenticationToken.class.isAssignableFrom(auth);
+  }
 }

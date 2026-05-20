@@ -42,11 +42,13 @@ public class SlotController {
       @RequestParam(required = false)
       Long degreeId
   ) {
+
   }
 
   @Schema(description = "Запрос на создание сетки слотов для программы образования")
   public record GenerateSlotsMeshRequest(
       Long degreeProgramId
   ) {
+
   }
 }

@@ -41,7 +41,8 @@ public class DegreeProgramController {
   @Operation(description = "Создание программы образования")
   @PostMapping("/degree-programs")
   @PreAuthorize(value = "hasAuthority('ADMIN')")
-  public ResponseEntity<Void> createDegreeProgram(@Valid @RequestBody DegreeProgramDto degreeProgramDto) {
+  public ResponseEntity<Void> createDegreeProgram(
+      @Valid @RequestBody DegreeProgramDto degreeProgramDto) {
     log.info("Creating degree program: {}", degreeProgramDto.name());
     degreeProgramService.createDegreeProgram(degreeProgramDto);
     log.info("Degree program created successfully: {}", degreeProgramDto.name());
