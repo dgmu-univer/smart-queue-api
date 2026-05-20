@@ -36,13 +36,16 @@ public class SlotGenerationServiceImpl implements SlotGenerationService {
       List<ExcludedSlotSettingsDto> excludedSlots) {
     var degreePrograms = degreeProgramRepository.findAll();
 
+    var start = System.currentTimeMillis();
     degreePrograms.forEach(degreeProgram -> {
       var slotsWithAppointments = slotRepository.findSlotsWithAppointments(degreeProgram.getId());
       var slots = generateSlotsForDegreeProgram(periodSettings, slotSettings, nonWorkingDays,
           excludedSlots, degreeProgram, slotsWithAppointments);
-      slotRepository.deleteAllByDegreeProgram(degreeProgram.getId(), slotsWithAppointments.stream().map(Slot::getId).toList());
+      slotRepository.deleteAllByDegreeProgram(degreeProgram.getId(),
+          slotsWithAppointments.stream().map(Slot::getId).toList());
       slotRepository.saveAll(slots);
     });
+    log.info("Generated slots in {} ms", System.currentTimeMillis() - start);
   }
 
   @Override
@@ -59,11 +62,6 @@ public class SlotGenerationServiceImpl implements SlotGenerationService {
       SlotSettingsDto slotSettings, List<java.time.LocalDate> nonWorkingDays,
       List<ExcludedSlotSettingsDto> excludedSlots, DegreeProgram program,
       List<Slot> slotsWithAppointments) {
-
-//    var startDate = LocalDateTime.of(periodSettings.getWorkDate().getStartDate(),
-//        periodSettings.getWorkTime().getStartTime());
-//    var endDate = LocalDateTime.of(periodSettings.getWorkDate().getEndDate(),
-//        periodSettings.getWorkTime().getEndTime());
 
     var degreeProgramId = program.getId();
 

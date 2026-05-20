@@ -7,4 +7,6 @@ import java.util.List;
 public record SlotResponse(
     @JsonFormat(pattern = "HH:mm")
     List<LocalTime> slots
-) {}
+) {
+
+}

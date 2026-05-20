@@ -55,5 +55,6 @@ public record UserDto(
       String username,
       String role
   ) {
+
   }
 }

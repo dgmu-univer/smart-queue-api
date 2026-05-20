@@ -41,7 +41,8 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(AuthenticationFailedException.class)
-  public ResponseEntity<ApiError> handleAuthenticationFailedException(AuthenticationFailedException e) {
+  public ResponseEntity<ApiError> handleAuthenticationFailedException(
+      AuthenticationFailedException e) {
     log.warn("Authentication failed: {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
         .body(new ApiError(e.getMessage(), HttpStatus.UNAUTHORIZED.value()));
@@ -55,7 +56,8 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<ApiError> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+  public ResponseEntity<ApiError> handleDataIntegrityViolationException(
+      DataIntegrityViolationException e) {
     log.error("Data integrity violation", e);
     String message = "Нарушение целостности данных. Возможно, запись уже существует";
     return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -70,31 +72,28 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(AuthorizationDeniedException.class)
-  public ResponseEntity<ApiError> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+  public ResponseEntity<ApiError> handleAuthorizationDeniedException(
+      AuthorizationDeniedException e) {
     log.warn("Access denied: {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.FORBIDDEN)
         .body(new ApiError("Доступ запрещен", HttpStatus.FORBIDDEN.value()));
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
-  public ResponseEntity<ApiError> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+  public ResponseEntity<ApiError> handleHttpMessageNotReadableException(
+      HttpMessageNotReadableException e) {
     log.warn("Invalid request format: {}", e.getMessage());
     return ResponseEntity.badRequest()
         .body(new ApiError("Неверный формат запроса", HttpStatus.BAD_REQUEST.value()));
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+  public ResponseEntity<ApiError> handleValidationExceptions(
+      MethodArgumentNotValidException ex) {
     log.warn("Validation failed for request");
-    Map<String, String> errors = new HashMap<>();
-
-    ex.getBindingResult().getAllErrors().forEach(error -> {
-      String fieldName = ((FieldError) error).getField();
-      String errorMessage = error.getDefaultMessage();
-      errors.put(fieldName, errorMessage);
-    });
-
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    return ResponseEntity.badRequest()
+        .body(new ApiError(ex.getBindingResult().getAllErrors().getFirst().getDefaultMessage(),
+            HttpStatus.BAD_REQUEST.value()));
   }
 
   @ExceptionHandler(IllegalArgumentException.class)

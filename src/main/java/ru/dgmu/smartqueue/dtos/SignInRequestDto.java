@@ -16,4 +16,5 @@ public record SignInRequestDto(
     @NotBlank(message = "Пароль не может быть пустыми")
     String password
 ) {
+
 }

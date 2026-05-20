@@ -25,23 +25,32 @@ public class PeriodSettingsDto {
   @NoArgsConstructor
   @AllArgsConstructor
   public static class Period {
-    @JsonProperty("start_date") private LocalDate startDate;
-    @JsonProperty("end_date") private LocalDate endDate;
+
+    @JsonProperty("start_date")
+    private LocalDate startDate;
+    @JsonProperty("end_date")
+    private LocalDate endDate;
   }
 
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
   public static class WorkingTime {
-    @JsonProperty("start_time") private LocalTime startTime;
-    @JsonProperty("end_time") private LocalTime endTime;
+
+    @JsonProperty("start_time")
+    private LocalTime startTime;
+    @JsonProperty("end_time")
+    private LocalTime endTime;
   }
 
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
   public static class Lunch {
-    @JsonProperty("start_time") private LocalTime startTime;
-    @JsonProperty("end_time") private LocalTime endTime;
+
+    @JsonProperty("start_time")
+    private LocalTime startTime;
+    @JsonProperty("end_time")
+    private LocalTime endTime;
   }
 }

@@ -27,8 +27,8 @@ public class Slot {
 
   @Id
   @Column(name = "id")
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "slot_id_seq")
-  @SequenceGenerator(name = "slot_id_seq", sequenceName = "slot_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "slot_seq_gen")
+  @SequenceGenerator(name = "slot_seq_gen", sequenceName = "slot_id_seq", allocationSize = 100)
   private Long id;
 
   @JoinColumn(name = "degree_program_id")

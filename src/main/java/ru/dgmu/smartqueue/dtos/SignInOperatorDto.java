@@ -11,4 +11,5 @@ public record SignInOperatorDto(
     @NotBlank(message = "Имя обязательно для ввода")
     String pin
 ) {
+
 }

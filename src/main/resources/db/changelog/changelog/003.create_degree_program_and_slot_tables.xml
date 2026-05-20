@@ -12,7 +12,7 @@
       </not>
     </preConditions>
 
-    <createSequence sequenceName="degree_programs_id_seq" startValue="1" incrementBy="1"/>
+    <createSequence sequenceName="degree_programs_id_seq" startValue="1" incrementBy="100"/>
 
     <createTable tableName="degree_programs">
       <column name="id" type="BIGINT" defaultValueComputed="nextval('degree_programs_id_seq')">
@@ -39,7 +39,7 @@
       </not>
     </preConditions>
 
-    <createSequence sequenceName="slot_id_seq" startValue="1" incrementBy="1"/>
+    <createSequence sequenceName="slot_id_seq" startValue="1" incrementBy="100"/>
 
     <createTable tableName="slots">
       <column name="id" type="BIGINT" defaultValueComputed="nextval('slot_id_seq')">

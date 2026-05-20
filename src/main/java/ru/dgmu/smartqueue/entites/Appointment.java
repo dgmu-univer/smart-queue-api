@@ -23,8 +23,8 @@ public class Appointment {
 
   @Id
   @Column
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "slot_id_seq")
-  @SequenceGenerator(name = "slot_id_seq", sequenceName = "slot_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "appointments_id_gen_seq")
+  @SequenceGenerator(name = "appointments_id_gen_seq", sequenceName = "appointments_id_seq", allocationSize = 1)
   private Long id;
 
   @Column
