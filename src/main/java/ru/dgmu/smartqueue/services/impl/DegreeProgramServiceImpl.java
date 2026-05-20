@@ -42,7 +42,7 @@ public class DegreeProgramServiceImpl implements DegreeProgramService {
         .toList();
     PeriodSettingsDto periodSettings = adminSettingService.getPeriodSettings();
 
-    return new DegreeProgramsWithPeriodDto(degreePresantations, periodSettings.workDate());
+    return new DegreeProgramsWithPeriodDto(degreePresantations, periodSettings.getWorkDate());
   }
 
   public List<DegreeProgramDto> getDegreePrograms() {

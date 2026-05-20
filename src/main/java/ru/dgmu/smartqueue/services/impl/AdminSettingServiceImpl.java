@@ -1,5 +1,6 @@
 package ru.dgmu.smartqueue.services.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
@@ -7,27 +8,17 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.dgmu.smartqueue.dtos.DegreeProgramDto;
-import ru.dgmu.smartqueue.dtos.DegreeProgramDto.DegreeProgramPresentation;
 import ru.dgmu.smartqueue.dtos.ExcludedSlotSettingsDto;
 import ru.dgmu.smartqueue.dtos.PeriodSettingsDto;
 import ru.dgmu.smartqueue.dtos.SlotSettingsDto;
 import ru.dgmu.smartqueue.entites.AdminSetting;
-import ru.dgmu.smartqueue.entites.DegreeProgram;
-import ru.dgmu.smartqueue.entites.User;
 import ru.dgmu.smartqueue.enums.AdminSettingResourceEnum;
-import ru.dgmu.smartqueue.enums.Role;
-import ru.dgmu.smartqueue.exception.ApiError;
 import ru.dgmu.smartqueue.repositories.AdminSettingsRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
-import ru.dgmu.smartqueue.services.DegreeProgramService;
-import ru.dgmu.smartqueue.services.UserService;
 
 @Service
 @RequiredArgsConstructor
@@ -47,12 +38,13 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
   @Override
   @Transactional
-  public void updatePeriodSettings(PeriodSettingsDto updatedPeriodSettingsDto) {
+  public void updatePeriodSettings(String jsonPatch) throws JsonProcessingException {
+    var currentSettings = getPeriodSettings();
+    var updatedSettings = mapper.readerForUpdating(currentSettings)
+        .readValue(jsonPatch);
     AdminSetting entity = repository.findById(AdminSettingResourceEnum.PERIODS)
         .orElseThrow(() -> new EntityNotFoundException("Period settings not found"));
-    PeriodSettingsDto current = mapper.convertValue(entity.getSettings(), PeriodSettingsDto.class);
-    PeriodSettingsDto merged = current.merge(updatedPeriodSettingsDto);
-    entity.setSettings(merged);
+    entity.setSettings(updatedSettings);
   }
 
   @Override

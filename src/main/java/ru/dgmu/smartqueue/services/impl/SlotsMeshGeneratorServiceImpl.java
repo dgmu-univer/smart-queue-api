@@ -6,26 +6,24 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.experimental.UtilityClass;
 import ru.dgmu.smartqueue.dtos.ExcludedSlotSettingsDto;
 import ru.dgmu.smartqueue.dtos.PeriodSettingsDto;
 import ru.dgmu.smartqueue.dtos.SlotDto;
 import ru.dgmu.smartqueue.dtos.SlotSettingsDto;
-import ru.dgmu.smartqueue.entites.Slot;
 
 public class SlotsMeshGeneratorServiceImpl {
 
   public List<SlotDto> generate(PeriodSettingsDto periodSettings, SlotSettingsDto slotSettings,
       List<LocalDate> nonWorkingDays, List<ExcludedSlotSettingsDto> excludedSlots, Long degreeProgramId) {
-    var workDate = periodSettings.workDate();
-    var workTime = periodSettings.workTime();
-    var lunch = periodSettings.lunch();
+    var workDate = periodSettings.getWorkDate();
+    var workTime = periodSettings.getWorkTime();
+    var lunch = periodSettings.getLunch();
 
     List<SlotDto> generatedSlots = new ArrayList<>();
     var exclusionsByDate = excludedSlots.stream()
         .collect(Collectors.groupingBy(dto -> LocalDate.parse(dto.date())));
 
-    for (LocalDate date = workDate.startDate(); !date.isAfter(workDate.endDate());
+    for (LocalDate date = workDate.getStartDate(); !date.isAfter(workDate.getEndDate());
         date = date.plusDays(1)) {
       if (nonWorkingDays.contains(date)) {
         continue;
@@ -34,21 +32,23 @@ public class SlotsMeshGeneratorServiceImpl {
       List<ExcludedSlotSettingsDto> dailyExclusions = exclusionsByDate.getOrDefault(date,
           List.of());
 
-      LocalTime currentTime = workTime.startTime();
+      LocalTime currentTime = workTime.getStartTime();
 
       while (true) {
         LocalTime slotEnd = currentTime.plusMinutes(slotSettings.durationMinutes());
 
-        if (slotEnd.isAfter(workTime.endTime())) {
+        if (slotEnd.isAfter(workTime.getEndTime())) {
           break;
         }
 
-        boolean intersectsWithLunch =
-            currentTime.isBefore(lunch.endTime()) && slotEnd.isAfter(lunch.startTime());
+        if (lunch != null && lunch.getStartTime() != null && lunch.getEndTime() != null) {
+          boolean intersectsWithLunch =
+              currentTime.isBefore(lunch.getEndTime()) && slotEnd.isAfter(lunch.getStartTime());
 
-        if (intersectsWithLunch) {
-          currentTime = lunch.endTime();
-          continue;
+          if (intersectsWithLunch) {
+            currentTime = lunch.getEndTime();
+            continue;
+          }
         }
 
         final LocalTime current = currentTime;

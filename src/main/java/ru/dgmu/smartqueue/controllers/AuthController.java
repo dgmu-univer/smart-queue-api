@@ -5,7 +5,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,10 +23,12 @@ import ru.dgmu.smartqueue.dtos.SignInRequestDto;
 import ru.dgmu.smartqueue.dtos.UserDto;
 import ru.dgmu.smartqueue.dtos.UserDto.UserContextPresentationDto;
 import ru.dgmu.smartqueue.entites.User;
+import ru.dgmu.smartqueue.exception.AuthenticationFailedException;
 
 @RestController
 @Tag(name = "Admin login", description = "Аутентификация администратора")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
   private final AuthenticationManager authenticationManager;
@@ -32,43 +36,57 @@ public class AuthController {
   @PostMapping("/login")
   @Operation(description = "Аутентификация администратора")
   public ResponseEntity<UserContextPresentationDto> login(
-      @RequestBody SignInRequestDto request,
+      @RequestBody @Valid SignInRequestDto request,
       HttpServletRequest httpRequest
   ) {
-    Authentication authentication;
-    SecurityContext context = SecurityContextHolder.createEmptyContext();
-    HttpSession session;
     try {
-      authentication = authenticationManager.authenticate(
+      log.debug("Attempting authentication for user: {}", request.username());
+
+      Authentication authentication = authenticationManager.authenticate(
           new UsernamePasswordAuthenticationToken(request.username(), request.password())
       );
+
+      SecurityContext context = SecurityContextHolder.createEmptyContext();
+      context.setAuthentication(authentication);
+      SecurityContextHolder.setContext(context);
+
+      HttpSession session = httpRequest.getSession(true);
+      session.setAttribute(
+          HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+          context
+      );
+
+      User user = (User) authentication.getPrincipal();
+      UserDto userDto = UserDto.fromEntity(user);
+
+      log.info("User {} successfully authenticated", request.username());
+      return ResponseEntity.ok(userDto.getUserContextPresentation());
+
     } catch (AuthenticationException e) {
+      log.warn("Authentication failed for user: {}", request.username());
       SecurityContextHolder.clearContext();
-      return ResponseEntity.badRequest().build();
+      throw new AuthenticationFailedException("Неверное имя пользователя или пароль");
     }
-
-    context.setAuthentication(authentication);
-    SecurityContextHolder.setContext(context);
-
-    session = httpRequest.getSession(true);
-    session.setAttribute(
-        HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-        context
-    );
-
-    User user = (User) authentication.getPrincipal();
-    UserDto userDto = UserDto.fromEntity(user);
-    return ResponseEntity.ok(userDto.getUserContextPresentation());
   }
 
   @PostMapping("/logout")
   @Operation(description = "Выход администратора")
-  public void logout(HttpServletRequest request, HttpServletResponse response) {
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      session.invalidate();
+  public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+    try {
+      HttpSession session = request.getSession(false);
+      if (session != null) {
+        session.invalidate();
+        log.debug("Session invalidated");
+      }
+      SecurityContextHolder.clearContext();
+      log.debug("Security context cleared");
+
+      return ResponseEntity.ok().build();
+    } catch (Exception e) {
+      log.error("Error during logout", e);
+      // Даже если произошла ошибка, очищаем контекст безопасности
+      SecurityContextHolder.clearContext();
+      return ResponseEntity.ok().build();
     }
-    SecurityContextHolder.clearContext();
-    response.setStatus(HttpServletResponse.SC_OK);
   }
 }
