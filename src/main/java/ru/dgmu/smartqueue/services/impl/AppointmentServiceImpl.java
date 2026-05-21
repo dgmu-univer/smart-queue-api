@@ -14,6 +14,7 @@ import ru.dgmu.smartqueue.entites.Slot;
 import ru.dgmu.smartqueue.exception.SlotOverflowed;
 import ru.dgmu.smartqueue.repositories.AppointmentRepository;
 import ru.dgmu.smartqueue.repositories.SlotRepository;
+import ru.dgmu.smartqueue.services.AdminSettingService;
 import ru.dgmu.smartqueue.services.AppointmentService;
 import ru.dgmu.smartqueue.services.MobileVerificationSenderService;
 import ru.dgmu.smartqueue.services.impl.OneTimeTokenGenerator.VerificationCode;
@@ -22,11 +23,10 @@ import ru.dgmu.smartqueue.services.impl.OneTimeTokenGenerator.VerificationCode;
 @RequiredArgsConstructor
 public class AppointmentServiceImpl implements AppointmentService {
 
-  private static final int SLOT_CAPACITY = 5;
-
   private final SlotRepository slotRepository;
   private final AppointmentRepository appointmentRepository;
   private final MobileVerificationSenderService mobileVerificationSenderService;
+  private final AdminSettingService adminSettingService;
 
   @Override
   @Transactional
@@ -47,8 +47,9 @@ public class AppointmentServiceImpl implements AppointmentService {
   }
 
   private boolean isSlotAlreadyOverflowed(Appointment appointment) {
+    var slotSettings = adminSettingService.getSlotSettings();
     List<Appointment> appointments = appointment.getSlot().getAppointments();
-    return appointments.size() >= SLOT_CAPACITY;
+    return appointments.size() >= slotSettings.capacityPerSlot();
   }
 
   @Override
