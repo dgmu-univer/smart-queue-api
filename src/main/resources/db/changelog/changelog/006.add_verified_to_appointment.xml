@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="006.add_verified_to_appointment-1" author="senior_dev">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="appointments" columnName="number"/>
+      </not>
+      <not>
+        <columnExists tableName="appointments" columnName="is_verified"/>
+      </not>
+      <not>
+        <columnExists tableName="appointments" columnName="requested_at"/>
+      </not>
+    </preConditions>
+
+    <addColumn tableName="appointments">
+      <column name="phone" type="VARCHAR(11)">
+        <constraints unique="true" nullable="false"/>
+      </column>
+      <column name="is_verified" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="requested_at" type="TIMESTAMP">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+
+    <sql>
+      CREATE UNIQUE INDEX appointments_unique_verified_phone
+        ON appointments (phone)
+        WHERE is_verified = true;
+    </sql>
+
+    <comment>Add is_verified and requested_at</comment>
+  </changeSet>
+
+</databaseChangeLog>
