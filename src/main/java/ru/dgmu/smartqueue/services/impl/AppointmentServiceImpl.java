@@ -11,6 +11,7 @@ import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
 import ru.dgmu.smartqueue.dtos.AppointmentsRequestDto;
 import ru.dgmu.smartqueue.entites.Appointment;
 import ru.dgmu.smartqueue.entites.Slot;
+import ru.dgmu.smartqueue.exception.IncorrectVerificationCode;
 import ru.dgmu.smartqueue.exception.SlotOverflowed;
 import ru.dgmu.smartqueue.repositories.AppointmentRepository;
 import ru.dgmu.smartqueue.repositories.SlotRepository;
@@ -58,6 +59,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     Appointment appointment = appointmentRepository.getReferenceById(verificationRequest.id());
     if (appointment.getPin().equals(verificationRequest.verificationCode())) {
       appointment.setIsVerified(Boolean.TRUE);
+    } else {
+      throw new IncorrectVerificationCode("Неверный код верификации");
     }
   }
 
