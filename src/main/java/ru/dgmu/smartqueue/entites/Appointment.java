@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,15 @@ public class Appointment {
 
   @Column
   private String pin;
+
+  @Column
+  private String phone;
+
+  @Column
+  private Boolean isVerified;
+
+  @Column
+  private LocalDateTime requestedAt;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "slot_id", nullable = false)

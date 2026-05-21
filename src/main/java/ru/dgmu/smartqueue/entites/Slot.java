@@ -41,6 +41,6 @@ public class Slot {
   @Column(name = "end_time_at")
   private LocalDateTime endTimeAt;
 
-  @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)
   List<Appointment> appointments;
 }
