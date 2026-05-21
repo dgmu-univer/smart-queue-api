@@ -12,7 +12,7 @@
       </not>
     </preConditions>
 
-    <createSequence sequenceName="user_id_seq" startValue="1" incrementBy="1"/>
+    <createSequence sequenceName="user_id_seq" startValue="3" incrementBy="1"/>
 
     <createTable tableName="users">
       <column name="id" type="BIGINT" defaultValueComputed="nextval('user_id_seq')">

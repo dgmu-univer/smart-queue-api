@@ -4,5 +4,5 @@ public enum AdminSettingResourceEnum {
   PERIODS,
   SLOTS,
   NON_WORKING_DAYS,
-  EXCLUDED_SLOTS;
+  EXCLUDED_SLOTS
 }

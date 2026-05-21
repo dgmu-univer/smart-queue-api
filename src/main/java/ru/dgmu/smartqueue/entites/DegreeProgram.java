@@ -23,8 +23,8 @@ public class DegreeProgram {
 
   @Id
   @Column
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "slot_id_seq")
-  @SequenceGenerator(name = "slot_id_seq", sequenceName = "slot_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "degree_programs_id_gen_seq")
+  @SequenceGenerator(name = "degree_programs_id_gen_seq", sequenceName = "degree_programs_id_seq", allocationSize = 100)
   private Long id;
 
   @Column(name = "name")

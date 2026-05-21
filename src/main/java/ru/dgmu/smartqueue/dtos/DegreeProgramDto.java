@@ -18,14 +18,6 @@ public record DegreeProgramDto(
     String pin
 ) {
 
-  public DegreeProgramPresentation toPresentation() {
-    return new DegreeProgramPresentation(id, name, description);
-  }
-
-  public DegreeProgram toEntity(User user) {
-    return new DegreeProgram(null, name, description, user);
-  }
-
   public static DegreeProgramDto fromEntity(DegreeProgram degreeProgram) {
     return new DegreeProgramDto(
         degreeProgram.getId(),
@@ -33,6 +25,14 @@ public record DegreeProgramDto(
         degreeProgram.getDescription(),
         degreeProgram.getUserId().getPin()
     );
+  }
+
+  public DegreeProgramPresentation toPresentation() {
+    return new DegreeProgramPresentation(id, name, description);
+  }
+
+  public DegreeProgram toEntity(User user) {
+    return new DegreeProgram(null, name, description, user);
   }
 
   @Schema(description = "Ответ с ифорацией оператора")

@@ -9,11 +9,11 @@ public record SlotSettingsDto(
     Integer capacityPerSlot
 ) {
 
-    public SlotSettingsDto merge(SlotSettingsDto patch) {
-        return new SlotSettingsDto(
-            patch.durationMinutes() != null ? patch.durationMinutes() : this.durationMinutes(),
-            patch.capacityPerSlot() != null ? patch.capacityPerSlot() : this.capacityPerSlot()
-        );
-    }
+  public SlotSettingsDto merge(SlotSettingsDto patch) {
+    return new SlotSettingsDto(
+        patch.durationMinutes() != null ? patch.durationMinutes() : this.durationMinutes(),
+        patch.capacityPerSlot() != null ? patch.capacityPerSlot() : this.capacityPerSlot()
+    );
+  }
 
 }

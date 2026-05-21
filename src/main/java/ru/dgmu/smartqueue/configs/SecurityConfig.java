@@ -34,14 +34,16 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/public/**").permitAll()
             .requestMatchers("/actuator/**").permitAll()
-            .requestMatchers( "/operator/login", "/login").permitAll()
-            .requestMatchers("/admin/**", "/swagger-ui.html", "/v3/**", "/swagger-ui/**").permitAll()
+            .requestMatchers("/operator/login", "/login").permitAll()
+            .requestMatchers("/admin/**", "/swagger-ui.html", "/v3/**", "/swagger-ui/**")
+            .permitAll()
             .requestMatchers("/error").permitAll()
             .anyRequest().authenticated()
         )
         .cors(cors -> cors.configurationSource(request -> {
           var corsConfiguration = new CorsConfiguration();
-          corsConfiguration.setAllowedOriginPatterns(List.of("https://price05.ru", "http://localhost:3000")); // todo вынести в переменную
+          corsConfiguration.setAllowedOriginPatterns(
+              List.of("https://price05.ru", "http://localhost:3000")); // todo вынести в переменную
           corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
           corsConfiguration.setAllowedHeaders(List.of("*"));
           return corsConfiguration;

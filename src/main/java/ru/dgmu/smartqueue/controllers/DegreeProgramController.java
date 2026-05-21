@@ -28,9 +28,9 @@ public class DegreeProgramController {
 
   private final DegreeProgramService degreeProgramService;
 
+  @Operation(description = "Получение всех программ образования")
   @GetMapping("/degree-programs")
   @PreAuthorize(value = "hasAuthority('ADMIN')")
-  @Operation(description = "Получение всех программ образования")
   public ResponseEntity<List<DegreeProgramDto>> getAllDegreePrograms() {
     log.debug("Getting all degree programs");
     List<DegreeProgramDto> programs = degreeProgramService.getDegreePrograms();
@@ -41,7 +41,8 @@ public class DegreeProgramController {
   @Operation(description = "Создание программы образования")
   @PostMapping("/degree-programs")
   @PreAuthorize(value = "hasAuthority('ADMIN')")
-  public ResponseEntity<Void> createDegreeProgram(@RequestBody @Valid DegreeProgramDto degreeProgramDto) {
+  public ResponseEntity<Void> createDegreeProgram(
+      @Valid @RequestBody DegreeProgramDto degreeProgramDto) {
     log.info("Creating degree program: {}", degreeProgramDto.name());
     degreeProgramService.createDegreeProgram(degreeProgramDto);
     log.info("Degree program created successfully: {}", degreeProgramDto.name());

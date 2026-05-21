@@ -1,7 +1,6 @@
 package ru.dgmu.smartqueue.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -41,7 +40,6 @@ import ru.dgmu.smartqueue.services.AdminSettingService;
 @SecurityRequirement(name = "bearerAuth")
 public class AdminSettingController {
 
-  private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
   private final AdminSettingService adminSettingService;
 
   @GetMapping("/periods")
@@ -68,7 +66,7 @@ public class AdminSettingController {
   })
   public ResponseEntity<Void> patchPeriodSettings(@RequestBody String jsonPatch)
       throws JsonProcessingException {
-    adminSettingService.updatePeriodSettings(jsonPatch);
+    adminSettingService.updatePeriodSettings(jsonPatch); // todo сюда перенести
     return ResponseEntity.ok().build();
   }
 
@@ -98,7 +96,7 @@ public class AdminSettingController {
       @RequestBody @Valid @Parameter(description = "Обновленные настройки слотов", required = true)
       SlotSettingsDto updatedSlotSettingsDto) {
     log.info("Updating slot settings");
-    adminSettingService.updateSlotSettings(updatedSlotSettingsDto);
+    adminSettingService.updateSlotSettings(updatedSlotSettingsDto);  // todo сюда перенести
     log.info("Slot settings updated successfully");
     return ResponseEntity.ok().build();
   }
@@ -124,13 +122,13 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "401", description = "Не авторизован"),
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
-  public ResponseEntity<List<LocalDate>> putNonWorkingDays(
+  public ResponseEntity<Void> putNonWorkingDays(
       @RequestBody @Valid @Parameter(description = "Обновленный список нерабочих дней", required = true)
       List<LocalDate> updatedNonWorkingDays) {
     log.info("Updating non-working days, count: {}", updatedNonWorkingDays.size());
-    List<LocalDate> result = adminSettingService.updateNonWorkingDays(updatedNonWorkingDays);
+    adminSettingService.updateNonWorkingDays(updatedNonWorkingDays);  // todo сюда перенести
     log.info("Non-working days updated successfully");
-    return ResponseEntity.ok(result);
+    return ResponseEntity.ok().build();
   }
 
   @GetMapping("/excluded-slots")
@@ -158,7 +156,7 @@ public class AdminSettingController {
       @RequestBody @Valid @Parameter(description = "Данные исключенного слота", required = true)
       ExcludedSlotSettingsDto excludedSlotSettingsDto) {
     log.info("Creating excluded slot");
-    adminSettingService.createExcludedSlot(excludedSlotSettingsDto);
+    adminSettingService.createExcludedSlot(excludedSlotSettingsDto);  // todo сюда перенести
     log.info("Excluded slot created successfully");
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
@@ -174,7 +172,7 @@ public class AdminSettingController {
   public ResponseEntity<Void> deleteExcludedSlot(
       @PathVariable @Parameter(description = "ID исключенного слота", required = true) Long id) {
     log.info("Deleting excluded slot with ID: {}", id);
-    adminSettingService.deleteExcludedSlot(id);
+    adminSettingService.deleteExcludedSlot(id);   // todo сюда перенести
     log.info("Excluded slot deleted successfully with ID: {}", id);
     return ResponseEntity.ok().build();
   }

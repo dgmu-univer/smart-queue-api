@@ -1,11 +1,11 @@
 package ru.dgmu.smartqueue.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -25,23 +25,32 @@ public class PeriodSettingsDto {
   @NoArgsConstructor
   @AllArgsConstructor
   public static class Period {
-    @JsonProperty("start_date") private LocalDate startDate;
-    @JsonProperty("end_date") private LocalDate endDate;
+
+    @JsonProperty("start_date")
+    private LocalDate startDate;
+    @JsonProperty("end_date")
+    private LocalDate endDate;
   }
 
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
   public static class WorkingTime {
-    @JsonProperty("start_time") private LocalTime startTime;
-    @JsonProperty("end_time") private LocalTime endTime;
+
+    @JsonProperty("start_time")
+    private LocalTime startTime;
+    @JsonProperty("end_time")
+    private LocalTime endTime;
   }
 
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
   public static class Lunch {
-    @JsonProperty("start_time") private LocalTime startTime;
-    @JsonProperty("end_time") private LocalTime endTime;
+
+    @JsonProperty("start_time")
+    private LocalTime startTime;
+    @JsonProperty("end_time")
+    private LocalTime endTime;
   }
 }

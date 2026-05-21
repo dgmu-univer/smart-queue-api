@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.dgmu.smartqueue.entites.DegreeProgram;
 import ru.dgmu.smartqueue.entites.Slot;
 
 @Repository
@@ -31,11 +30,17 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
       @Param("slotCapacity") int slotCapacity
   );
 
+  // todo добавить даты из настроек периода
+  @Query("""
+      SELECT s FROM Slot s JOIN FETCH s.appointments WHERE s.degreeProgram.id = :degreeProgramId 
+      """)
+  List<Slot> findSlotsWithAppointments(Long degreeProgramId);
+
 
   @Modifying
   @Query("""
           DELETE FROM Slot s
-          WHERE s.degreeProgram.id = :degreeId
+          WHERE s.degreeProgram.id = :degreeId AND s.id NOT IN (:slotsWithAppointments)
       """)
-  void deleteAllByDegreeProgram(@Param("degreeId") Long degreeId);
+  void deleteAllByDegreeProgram(@Param("degreeId") Long degreeId, List<Long> slotsWithAppointments);
 }

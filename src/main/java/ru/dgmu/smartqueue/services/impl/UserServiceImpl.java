@@ -12,23 +12,23 @@ import ru.dgmu.smartqueue.services.UserService;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository repository;
+  private final UserRepository repository;
 
-    @Override
-    public User create(User user) {
-        if (repository.existsByUsername(user.getUsername())) {
-            throw new RuntimeException("Пользователь с таким именем уже существует");
-        }
-        return repository.save(user);
+  @Override
+  public User create(User user) {
+    if (repository.existsByUsername(user.getUsername())) {
+      throw new RuntimeException("Пользователь с таким именем уже существует");
     }
+    return repository.save(user);
+  }
 
-    public UserDetailsService userDetailsService() {
-        return this::getByUsername;
-    }
+  public UserDetailsService userDetailsService() {
+    return this::getByUsername;
+  }
 
-    private User getByUsername(String username) {
-        return repository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
+  private User getByUsername(String username) {
+    return repository.findByUsername(username)
+        .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
 
-    }
+  }
 }
