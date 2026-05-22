@@ -1,5 +1,6 @@
 package ru.dgmu.smartqueue.entites;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,5 +36,6 @@ public class DegreeProgram {
 
   @JoinColumn(name = "user_id")
   @OneToOne(cascade = CascadeType.ALL)
+  @JsonIgnore
   private User userId;
 }
