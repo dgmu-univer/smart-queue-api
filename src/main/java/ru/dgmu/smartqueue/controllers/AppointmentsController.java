@@ -30,7 +30,7 @@ public class AppointmentsController {
 
   private final AppointmentService appointmentService;
 
-  @PostMapping("/appointments")
+  @PostMapping("/public/appointments")
   @Operation(summary = "Запись в слот", description = "Создает новую неверефицированную запись")
   public ResponseEntity<Long> bookSlot(@RequestBody @Valid AppointmentsRequestDto requestDto) {
     return ResponseEntity.ok(appointmentService.bookSlot(requestDto));
