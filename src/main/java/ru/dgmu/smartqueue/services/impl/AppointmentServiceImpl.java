@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,18 +56,19 @@ public class AppointmentServiceImpl implements AppointmentService {
 
   @Override
   @Transactional
-  public void verifyAppointment(AppointmentVerificationRequest verificationRequest) {
+  public Appointment verifyAppointment(AppointmentVerificationRequest verificationRequest) {
     Appointment appointment = appointmentRepository.getReferenceById(verificationRequest.id());
     if (appointment.getPin().equals(verificationRequest.verificationCode())) {
       appointment.setIsVerified(Boolean.TRUE);
     } else {
       throw new IncorrectVerificationCode("Неверный код верификации");
     }
+    return appointmentRepository.save(appointment);
   }
 
   @Override
-  public List<Appointment> getTets() {
-    return appointmentRepository.findAll();
+  public Appointment getTets(Long id) {
+    return appointmentRepository.findById(id).orElseThrow(EntityNotFoundException::new);
   }
 
   // todo шедуллер который будет выгребать все устаревшие не верефицированные соты

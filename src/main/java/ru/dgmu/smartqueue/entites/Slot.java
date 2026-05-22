@@ -1,5 +1,6 @@
 package ru.dgmu.smartqueue.entites;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,5 +43,6 @@ public class Slot {
   private LocalDateTime endTimeAt;
 
   @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)
+  @JsonIgnore
   List<Appointment> appointments;
 }
