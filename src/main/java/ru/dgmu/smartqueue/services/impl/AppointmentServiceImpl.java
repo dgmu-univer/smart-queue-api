@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
 import ru.dgmu.smartqueue.dtos.AppointmentsRequestDto;
+import ru.dgmu.smartqueue.dtos.CalendarAppointmentsResponseDto;
 import ru.dgmu.smartqueue.entites.Appointment;
 import ru.dgmu.smartqueue.entites.Slot;
 import ru.dgmu.smartqueue.exception.IncorrectVerificationCode;
@@ -68,6 +69,24 @@ public class AppointmentServiceImpl implements AppointmentService {
   @Override
   public Appointment getTets(Long id) {
     return appointmentRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<CalendarAppointmentsResponseDto> getAllByFilter(LocalDateTime from, LocalDateTime to, Long degreeId) {
+    List<Appointment> allByInterval = appointmentRepository.findAllByInterval(from, to, degreeId);
+    return allByInterval.stream()
+        .map(this::buildCalendarResponseDto)
+        .toList();
+  }
+
+  CalendarAppointmentsResponseDto buildCalendarResponseDto(Appointment appointment) {
+    return new CalendarAppointmentsResponseDto(
+        appointment.getId(),
+        appointment.getPin(),
+        appointment.getSlot().getStartTimeAt(),
+        appointment.getSlot().getEndTimeAt()
+    );
   }
 
   // todo шедуллер который будет выгребать все устаревшие не верефицированные соты

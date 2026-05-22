@@ -33,7 +33,6 @@ import ru.dgmu.smartqueue.services.AdminSettingService;
 
 @RestController
 @RequestMapping("/admin-settings")
-@PreAuthorize(value = "hasAuthority('ADMIN')")
 @Slf4j
 @RequiredArgsConstructor
 @Tag(name = "Admin Settings", description = "Управление настройками администратора")
@@ -50,6 +49,7 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "401", description = "Не авторизован"),
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
+  @PreAuthorize(value = "hasAuthority('ADMIN')")
   public ResponseEntity<PeriodSettingsDto> getPeriodSettings() {
     log.debug("Getting period settings");
     PeriodSettingsDto settings = adminSettingService.getPeriodSettings();
@@ -64,6 +64,7 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "401", description = "Не авторизован"),
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
+  @PreAuthorize(value = "hasAuthority('ADMIN')")
   public ResponseEntity<Void> patchPeriodSettings(@RequestBody String jsonPatch)
       throws JsonProcessingException {
     adminSettingService.updatePeriodSettings(jsonPatch); // todo сюда перенести
@@ -78,6 +79,7 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "401", description = "Не авторизован"),
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
+  @PreAuthorize(value = "hasAuthority('OPERATOR')")
   public ResponseEntity<SlotSettingsDto> getSlots() {
     log.debug("Getting slot settings");
     SlotSettingsDto settings = adminSettingService.getSlotSettings();
@@ -92,6 +94,7 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "401", description = "Не авторизован"),
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
+  @PreAuthorize(value = "hasAuthority('ADMIN')")
   public ResponseEntity<Void> patchSlotsSettings(
       @RequestBody @Valid @Parameter(description = "Обновленные настройки слотов", required = true)
       SlotSettingsDto updatedSlotSettingsDto) {
@@ -108,6 +111,7 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "401", description = "Не авторизован"),
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
+  @PreAuthorize(value = "hasAuthority('ADMIN')")
   public ResponseEntity<List<LocalDate>> getNonWorkingDays() {
     log.debug("Getting non-working days");
     List<LocalDate> nonWorkingDays = adminSettingService.getNonWorkingDays();
@@ -122,6 +126,7 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "401", description = "Не авторизован"),
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
+  @PreAuthorize(value = "hasAuthority('ADMIN')")
   public ResponseEntity<Void> putNonWorkingDays(
       @RequestBody @Valid @Parameter(description = "Обновленный список нерабочих дней", required = true)
       List<LocalDate> updatedNonWorkingDays) {
@@ -138,6 +143,7 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "401", description = "Не авторизован"),
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
+  @PreAuthorize(value = "hasAuthority('ADMIN')")
   public ResponseEntity<List<ExcludedSlotSettingsDto>> getExcludedSlots() {
     log.debug("Getting excluded slots");
     List<ExcludedSlotSettingsDto> excludedSlots = adminSettingService.getExcludedSlots();
@@ -152,6 +158,7 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "401", description = "Не авторизован"),
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
+  @PreAuthorize(value = "hasAuthority('ADMIN')")
   public ResponseEntity<Void> createExcludedSlot(
       @RequestBody @Valid @Parameter(description = "Данные исключенного слота", required = true)
       ExcludedSlotSettingsDto excludedSlotSettingsDto) {
@@ -169,6 +176,7 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "401", description = "Не авторизован"),
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
+  @PreAuthorize(value = "hasAuthority('ADMIN')")
   public ResponseEntity<Void> deleteExcludedSlot(
       @PathVariable @Parameter(description = "ID исключенного слота", required = true) Long id) {
     log.info("Deleting excluded slot with ID: {}", id);

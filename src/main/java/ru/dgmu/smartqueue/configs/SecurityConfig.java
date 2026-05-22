@@ -32,7 +32,7 @@ public class SecurityConfig {
     http
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/public/**").permitAll()
+            .requestMatchers("/public/**", "/appointments").permitAll() // todo закрыть appointments
             .requestMatchers("/actuator/**").permitAll()
             .requestMatchers("/operator/login", "/login").permitAll()
             .requestMatchers("/admin/**", "/swagger-ui.html", "/v3/**", "/swagger-ui/**")
