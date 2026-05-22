@@ -64,6 +64,11 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
   }
 
+  @Override
+  public List<Appointment> getTets() {
+    return appointmentRepository.findAll();
+  }
+
   // todo шедуллер который будет выгребать все устаревшие не верефицированные соты
 
   // todo подумать как сделать недоступность слотов которые уже переполнены даже если appointment not verified

@@ -3,15 +3,18 @@ package ru.dgmu.smartqueue.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
 import ru.dgmu.smartqueue.dtos.AppointmentsRequestDto;
+import ru.dgmu.smartqueue.entites.Appointment;
 import ru.dgmu.smartqueue.services.AppointmentService;
 
 @RestController
@@ -34,6 +37,12 @@ public class AppointmentsController {
   public ResponseEntity<Void> verify(@RequestBody @Valid AppointmentVerificationRequest verificationRequest) {
     appointmentService.verifyAppointment(verificationRequest);
     return ResponseEntity.ok().build();
+  }
+
+  @GetMapping
+  @Operation(summary = "Тестовый эндпоинт возвращения всех записей", description = "Возвращает все записи в табилце")
+  public ResponseEntity<List<Appointment>> getAll() {
+    return ResponseEntity.ok(appointmentService.getTets());
   }
 
   // TODO: Реализовать методы для работы с записями
