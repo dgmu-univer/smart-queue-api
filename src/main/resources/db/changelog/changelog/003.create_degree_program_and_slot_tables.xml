@@ -57,7 +57,8 @@
       </column>
     </createTable>
 
-    <addUniqueConstraint tableName="slots" columnNames="degree_program_id, start_time_at, end_time_at"/>
+    <addUniqueConstraint tableName="slots"
+      columnNames="degree_program_id, start_time_at, end_time_at"/>
 
     <comment>Initial creation of slots table</comment>
   </changeSet>

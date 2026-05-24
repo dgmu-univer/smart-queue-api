@@ -1,6 +1,7 @@
 package ru.dgmu.smartqueue.services.impl;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -36,7 +37,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     VerificationCode verificationCode = OneTimeTokenGenerator.generateCode();
     Slot slot = slotRepository.getSlotByStartTimeAtAndDegreeProgram_Id(
         LocalDateTime.of(requestDto.date(),
-                requestDto.time()).atZone(ZoneOffset.UTC).toLocalDateTime(),
+            requestDto.time()).atZone(ZoneOffset.UTC).toLocalDateTime(),
         requestDto.degreeId()).orElseThrow(EntityNotFoundException::new);
     Appointment appointment = buildEntity(requestDto, verificationCode, slot);
     Appointment notVerifiedAppointment = appointmentRepository.save(appointment);
@@ -73,7 +74,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<CalendarAppointmentsResponseDto> getAllByFilter(LocalDateTime from, LocalDateTime to, Long degreeId) {
+  public List<CalendarAppointmentsResponseDto> getAllByFilter(LocalDate from, LocalDate to,
+      Long degreeId) {
     List<Appointment> allByInterval = appointmentRepository.findAllByInterval(from, to, degreeId);
     return allByInterval.stream()
         .map(this::buildCalendarResponseDto)

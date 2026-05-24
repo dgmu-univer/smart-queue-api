@@ -1,6 +1,6 @@
 package ru.dgmu.smartqueue.repositories;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,10 +18,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 //  """)
 //  List<Appointment> findByFilter(@Param("filter") AppointmentsFilter filter);
 
-    @Query("""
-    SELECT a FROM Appointment a
-    WHERE a.isVerified = true AND a.slot.startTimeAt between :from AND :to
-      AND a.slot.degreeProgram.id = :degreeId
-  """)
-  List<Appointment> findAllByInterval(LocalDateTime from, LocalDateTime to, Long degreeId);
+  @Query("""
+        SELECT a FROM Appointment a
+        WHERE a.isVerified = true AND CAST(a.slot.startTimeAt AS localdate) between :from AND :to
+          AND a.slot.degreeProgram.id = :degreeId
+      """)
+  List<Appointment> findAllByInterval(LocalDate from, LocalDate to, Long degreeId);
 }

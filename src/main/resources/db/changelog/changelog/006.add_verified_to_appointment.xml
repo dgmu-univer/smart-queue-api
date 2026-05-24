@@ -32,8 +32,7 @@
 
     <sql>
       CREATE UNIQUE INDEX appointments_unique_verified_phone
-        ON appointments (phone)
-        WHERE is_verified = true;
+        ON appointments (phone) WHERE is_verified = true;
     </sql>
 
     <comment>Add is_verified and requested_at</comment>

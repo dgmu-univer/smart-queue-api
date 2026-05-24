@@ -13,12 +13,12 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Phone {
-    
-    String message() default "Неверный формат номера телефона";
-    
-    Class<?>[] groups() default {};
-    
-    Class<? extends Payload>[] payload() default {};
 
-    String defaultRegion() default "RU";
+  String message() default "Неверный формат номера телефона";
+
+  Class<?>[] groups() default {};
+
+  Class<? extends Payload>[] payload() default {};
+
+  String defaultRegion() default "RU";
 }

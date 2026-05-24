@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
   <include file="changelog/001.create_users_table.xml" relativeToChangelogFile="true"/>
   <include file="changelog/002.create_admin_settings_table.xml" relativeToChangelogFile="true"/>
-  <include file="changelog/003.create_degree_program_and_slot_tables.xml" relativeToChangelogFile="true"/>
+  <include file="changelog/003.create_degree_program_and_slot_tables.xml"
+    relativeToChangelogFile="true"/>
   <include file="changelog/004.add_pin_to_user_table.xml" relativeToChangelogFile="true"/>
   <include file="changelog/005.create_appointment_table.xml" relativeToChangelogFile="true"/>
   <include file="changelog/006.add_verified_to_appointment.xml" relativeToChangelogFile="true"/>
