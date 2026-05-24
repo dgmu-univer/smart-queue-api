@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public record CalendarAppointmentsResponseDto(
     Long id,
-    String titile,
+    String title,
     LocalDateTime start,
     LocalDateTime end
 ) {
