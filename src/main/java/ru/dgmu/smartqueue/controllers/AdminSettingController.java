@@ -49,7 +49,7 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "401", description = "Не авторизован"),
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
-  @PreAuthorize(value = "hasAuthority('ADMIN')")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'OPERATOR')")
   public ResponseEntity<PeriodSettingsDto> getPeriodSettings() {
     log.debug("Getting period settings");
     PeriodSettingsDto settings = adminSettingService.getPeriodSettings();
@@ -67,7 +67,7 @@ public class AdminSettingController {
   @PreAuthorize(value = "hasAuthority('ADMIN')")
   public ResponseEntity<Void> patchPeriodSettings(@RequestBody String jsonPatch)
       throws JsonProcessingException {
-    adminSettingService.updatePeriodSettings(jsonPatch); // todo сюда перенести
+    adminSettingService.updatePeriodSettings(jsonPatch);
     return ResponseEntity.ok().build();
   }
 
@@ -79,7 +79,7 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "401", description = "Не авторизован"),
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
-  @PreAuthorize(value = "hasAuthority('OPERATOR')")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'OPERATOR')")
   public ResponseEntity<SlotSettingsDto> getSlots() {
     log.debug("Getting slot settings");
     SlotSettingsDto settings = adminSettingService.getSlotSettings();
@@ -99,7 +99,7 @@ public class AdminSettingController {
       @RequestBody @Valid @Parameter(description = "Обновленные настройки слотов", required = true)
       SlotSettingsDto updatedSlotSettingsDto) {
     log.info("Updating slot settings");
-    adminSettingService.updateSlotSettings(updatedSlotSettingsDto);  // todo сюда перенести
+    adminSettingService.updateSlotSettings(updatedSlotSettingsDto);
     log.info("Slot settings updated successfully");
     return ResponseEntity.ok().build();
   }
@@ -111,7 +111,7 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "401", description = "Не авторизован"),
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
-  @PreAuthorize(value = "hasAuthority('ADMIN')")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'OPERATOR')")
   public ResponseEntity<List<LocalDate>> getNonWorkingDays() {
     log.debug("Getting non-working days");
     List<LocalDate> nonWorkingDays = adminSettingService.getNonWorkingDays();
@@ -131,7 +131,7 @@ public class AdminSettingController {
       @RequestBody @Valid @Parameter(description = "Обновленный список нерабочих дней", required = true)
       List<LocalDate> updatedNonWorkingDays) {
     log.info("Updating non-working days, count: {}", updatedNonWorkingDays.size());
-    adminSettingService.updateNonWorkingDays(updatedNonWorkingDays);  // todo сюда перенести
+    adminSettingService.updateNonWorkingDays(updatedNonWorkingDays);
     log.info("Non-working days updated successfully");
     return ResponseEntity.ok().build();
   }
@@ -143,11 +143,10 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "401", description = "Не авторизован"),
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
-  @PreAuthorize(value = "hasAuthority('ADMIN')")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'OPERATOR')")
   public ResponseEntity<List<ExcludedSlotSettingsDto>> getExcludedSlots() {
     log.debug("Getting excluded slots");
-    List<ExcludedSlotSettingsDto> excludedSlots = adminSettingService.getExcludedSlots();
-    return ResponseEntity.ok(excludedSlots);
+    return ResponseEntity.ok(adminSettingService.getExcludedSlots());
   }
 
   @PostMapping("/excluded-slots")
@@ -163,7 +162,7 @@ public class AdminSettingController {
       @RequestBody @Valid @Parameter(description = "Данные исключенного слота", required = true)
       ExcludedSlotSettingsDto excludedSlotSettingsDto) {
     log.info("Creating excluded slot");
-    adminSettingService.createExcludedSlot(excludedSlotSettingsDto);  // todo сюда перенести
+    adminSettingService.createExcludedSlot(excludedSlotSettingsDto);
     log.info("Excluded slot created successfully");
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
@@ -180,7 +179,7 @@ public class AdminSettingController {
   public ResponseEntity<Void> deleteExcludedSlot(
       @PathVariable @Parameter(description = "ID исключенного слота", required = true) Long id) {
     log.info("Deleting excluded slot with ID: {}", id);
-    adminSettingService.deleteExcludedSlot(id);   // todo сюда перенести
+    adminSettingService.deleteExcludedSlot(id);
     log.info("Excluded slot deleted successfully with ID: {}", id);
     return ResponseEntity.ok().build();
   }

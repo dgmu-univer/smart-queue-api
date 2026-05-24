@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.dgmu.smartqueue.controllers.SlotController.SlotFilter;
 import ru.dgmu.smartqueue.entites.Slot;
 
 @Repository
@@ -49,5 +48,6 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
   void deleteAllByDegreeProgram(@Param("degreeId") Long degreeId, List<Long> slotsWithAppointments);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
-  Optional<Slot> getSlotByStartTimeAtAndDegreeProgram_Id(LocalDateTime startTime, Long degreeProgramId);
+  Optional<Slot> getSlotByStartTimeAtAndDegreeProgram_Id(LocalDateTime startTime,
+      Long degreeProgramId);
 }

@@ -8,7 +8,7 @@
   <changeSet id="005.create_appointment_table-1" author="senior_dev">
     <preConditions onFail="MARK_RAN">
       <not>
-        <tableExists tableName="appointments" />
+        <tableExists tableName="appointments"/>
       </not>
     </preConditions>
 
