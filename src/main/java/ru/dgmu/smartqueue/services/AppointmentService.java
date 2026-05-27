@@ -17,4 +17,6 @@ public interface AppointmentService {
 
   List<CalendarAppointmentsResponseDto> getAllByFilter(LocalDate from, LocalDate to,
       Long degreeId);
+
+  long countByDegreeAndDate(Long degreeId, LocalDate date);
 }
