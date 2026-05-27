@@ -1,5 +1,7 @@
 package ru.dgmu.smartqueue.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -17,11 +19,13 @@ import ru.dgmu.smartqueue.services.StatisticService;
 @RequestMapping("/statistics")
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyAuthority('ADMIN', 'OPERATOR')")
+@Tag(name = "Statistics", description = "Получение статистики")
 public class StatisticController {
 
   private final StatisticService statisticService;
 
   @GetMapping
+  @Operation(summary = "Эндпоинт получения статистики", description = "Возаращает количество записей по программе образования и дате")
   public ResponseEntity<StatisticResponseDto> getStatistic(@Valid StatisticRequestParams params) {
     return ResponseEntity.ok(statisticService.getStatistic(params.degreeId, params.date));
   }
