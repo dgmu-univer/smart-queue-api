@@ -11,9 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
 import ru.dgmu.smartqueue.dtos.AppointmentsRequestDto;
 import ru.dgmu.smartqueue.dtos.CalendarAppointmentsResponseDto;
+import ru.dgmu.smartqueue.dtos.StatisticResponseDto;
 import ru.dgmu.smartqueue.entites.Appointment;
 import ru.dgmu.smartqueue.entites.Slot;
 import ru.dgmu.smartqueue.exception.IncorrectVerificationCode;
+import ru.dgmu.smartqueue.exception.SlotExpired;
 import ru.dgmu.smartqueue.exception.SlotOverflowed;
 import ru.dgmu.smartqueue.repositories.AppointmentRepository;
 import ru.dgmu.smartqueue.repositories.SlotRepository;
@@ -34,6 +36,9 @@ public class AppointmentServiceImpl implements AppointmentService {
   @Override
   @Transactional
   public Long bookSlot(AppointmentsRequestDto requestDto) {
+    if (requestDto.date().isBefore(LocalDate.now())) {
+      throw new SlotExpired("Вы не можете записаться в слот с временем начала ранее текущего времени");
+    }
     VerificationCode verificationCode = OneTimeTokenGenerator.generateCode();
     Slot slot = slotRepository.getSlotByStartTimeAtAndDegreeProgram_Id(
         LocalDateTime.of(requestDto.date(),
@@ -80,6 +85,11 @@ public class AppointmentServiceImpl implements AppointmentService {
     return allByInterval.stream()
         .map(this::buildCalendarResponseDto)
         .toList();
+  }
+
+  @Override
+  public long countByDegreeAndDate(Long degreeId, LocalDate date) {
+    return appointmentRepository.countByDateAndDegreeProgramId(date, degreeId);
   }
 
   CalendarAppointmentsResponseDto buildCalendarResponseDto(Appointment appointment) {
