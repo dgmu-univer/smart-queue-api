@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
 import ru.dgmu.smartqueue.dtos.AppointmentsRequestDto;
 import ru.dgmu.smartqueue.dtos.CalendarAppointmentsResponseDto;
-import ru.dgmu.smartqueue.dtos.StatisticResponseDto;
 import ru.dgmu.smartqueue.entites.Appointment;
 import ru.dgmu.smartqueue.entites.Slot;
 import ru.dgmu.smartqueue.exception.IncorrectVerificationCode;
@@ -36,9 +35,8 @@ public class AppointmentServiceImpl implements AppointmentService {
   @Override
   @Transactional
   public Long bookSlot(AppointmentsRequestDto requestDto) {
-    if (requestDto.date().isBefore(LocalDate.now())) {
-      throw new SlotExpired("Вы не можете записаться в слот с временем начала ранее текущего времени");
-    }
+//    validateOnExistAppointments(requestDto);
+    validateBookingDateExpiring(requestDto);
     VerificationCode verificationCode = OneTimeTokenGenerator.generateCode();
     Slot slot = slotRepository.getSlotByStartTimeAtAndDegreeProgram_Id(
         LocalDateTime.of(requestDto.date(),
@@ -54,8 +52,23 @@ public class AppointmentServiceImpl implements AppointmentService {
     return notVerifiedAppointment.getId();
   }
 
+//  private void validateOnExistAppointments(AppointmentsRequestDto requestDto) {
+//    boolean isAlreadyHasAppointment = appointmentRepository.existsBySlot_DegreeProgram_IdAndPhone(
+//        requestDto.degreeId(),
+//        requestDto.phone());
+//    if (isAlreadyHasAppointment) {
+//      throw new AlreadyHasAppointment();
+//    }
+//  }
+
+  private void validateBookingDateExpiring(AppointmentsRequestDto requestDto) {
+    if (requestDto.date().isBefore(LocalDate.now())) {
+      throw new SlotExpired("Вы не можете записаться в слот с временем начала ранее текущего времени");
+    }
+  }
+
   private boolean isSlotAlreadyOverflowed(Appointment appointment) {
-    var slotSettings = adminSettingService.getSlotSettings();
+    var slotSettings = adminSettingService.getSlotSettings(appointment.getSlot().getDegreeProgram().getId());
     List<Appointment> appointments = appointment.getSlot().getAppointments();
     return appointments.size() >= slotSettings.capacityPerSlot();
   }

@@ -3,27 +3,30 @@ package ru.dgmu.smartqueue.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.LocalDate;
 import java.util.List;
+import ru.dgmu.smartqueue.dtos.AdminSettingsDto;
 import ru.dgmu.smartqueue.dtos.ExcludedSlotSettingsDto;
 import ru.dgmu.smartqueue.dtos.PeriodSettingsDto;
 import ru.dgmu.smartqueue.dtos.SlotSettingsDto;
 
 public interface AdminSettingService {
 
-  PeriodSettingsDto getPeriodSettings();
+  AdminSettingsDto getAdminSettings(Long degreeId);
 
-  void updatePeriodSettings(String jsonPatch) throws JsonProcessingException;
+  PeriodSettingsDto getPeriodSettings(Long degreeId);
 
-  SlotSettingsDto getSlotSettings();
+  void updatePeriodSettings(Long degreeId, PeriodSettingsDto periodSettingsDto) throws JsonProcessingException;
 
-  void updateSlotSettings(SlotSettingsDto updatedSlotSettingsDto);
+  SlotSettingsDto getSlotSettings(Long degreeId);
 
-  List<LocalDate> getNonWorkingDays();
+  void updateSlotSettings(Long degreeId, SlotSettingsDto updatedSlotSettingsDto);
 
-  void updateNonWorkingDays(List<LocalDate> updatedNonWorkingDays);
+  List<LocalDate> getNonWorkingDays(Long degreeId);
 
-  List<ExcludedSlotSettingsDto> getExcludedSlots();
+  void updateNonWorkingDays(Long degreeId, List<LocalDate> updatedNonWorkingDays);
 
-  void createExcludedSlot(ExcludedSlotSettingsDto excludedSlotSettingsDto);
+  List<ExcludedSlotSettingsDto> getExcludedSlots(Long degreeId);
 
-  void deleteExcludedSlot(Long id);
+  void createExcludedSlot(Long degreeId, ExcludedSlotSettingsDto excludedSlotSettingsDto);
+
+  void deleteExcludedSlot(Long degreeId, Long id);
 }

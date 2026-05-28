@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.dgmu.smartqueue.entites.AdminSetting;
 
 @Data
 @NoArgsConstructor
@@ -52,5 +53,13 @@ public class PeriodSettingsDto {
     private LocalTime startTime;
     @JsonProperty("end_time")
     private LocalTime endTime;
+  }
+
+  public static PeriodSettingsDto fromEntity(AdminSetting setting) {
+    return new PeriodSettingsDto(
+        new Period(setting.getWorkStartDate(), setting.getWorkEndDate()),
+        new WorkingTime(setting.getWorkStartTime(), setting.getWorkEndTime()),
+        new Lunch(setting.getLunchStartTime(), setting.getLunchEndTime())
+    );
   }
 }

@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.dgmu.smartqueue.dtos.ExcludedSlotSettingsDto;
 import ru.dgmu.smartqueue.dtos.PeriodSettingsDto;
@@ -50,9 +52,9 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
   @PreAuthorize("hasAnyAuthority('ADMIN', 'OPERATOR')")
-  public ResponseEntity<PeriodSettingsDto> getPeriodSettings() {
+  public ResponseEntity<PeriodSettingsDto> getPeriodSettings(@Valid RequestParams params) {
     log.debug("Getting period settings");
-    PeriodSettingsDto settings = adminSettingService.getPeriodSettings();
+    PeriodSettingsDto settings = adminSettingService.getPeriodSettings(params.degreeId());
     return ResponseEntity.ok(settings);
   }
 
@@ -65,9 +67,9 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
   @PreAuthorize(value = "hasAuthority('ADMIN')")
-  public ResponseEntity<Void> patchPeriodSettings(@RequestBody String jsonPatch)
+  public ResponseEntity<Void> patchPeriodSettings(@Valid RequestParams params, @RequestBody PeriodSettingsDto periodSettingsDto)
       throws JsonProcessingException {
-    adminSettingService.updatePeriodSettings(jsonPatch);
+    adminSettingService.updatePeriodSettings(params.degreeId(), periodSettingsDto);
     return ResponseEntity.ok().build();
   }
 
@@ -80,9 +82,9 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
   @PreAuthorize("hasAnyAuthority('ADMIN', 'OPERATOR')")
-  public ResponseEntity<SlotSettingsDto> getSlots() {
+  public ResponseEntity<SlotSettingsDto> getSlots(@Valid RequestParams params) {
     log.debug("Getting slot settings");
-    SlotSettingsDto settings = adminSettingService.getSlotSettings();
+    SlotSettingsDto settings = adminSettingService.getSlotSettings(params.degreeId());
     return ResponseEntity.ok(settings);
   }
 
@@ -96,10 +98,11 @@ public class AdminSettingController {
   })
   @PreAuthorize(value = "hasAuthority('ADMIN')")
   public ResponseEntity<Void> patchSlotsSettings(
+      @Valid RequestParams params,
       @RequestBody @Valid @Parameter(description = "Обновленные настройки слотов", required = true)
       SlotSettingsDto updatedSlotSettingsDto) {
     log.info("Updating slot settings");
-    adminSettingService.updateSlotSettings(updatedSlotSettingsDto);
+    adminSettingService.updateSlotSettings(params.degreeId(), updatedSlotSettingsDto);
     log.info("Slot settings updated successfully");
     return ResponseEntity.ok().build();
   }
@@ -112,9 +115,9 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
   @PreAuthorize("hasAnyAuthority('ADMIN', 'OPERATOR')")
-  public ResponseEntity<List<LocalDate>> getNonWorkingDays() {
+  public ResponseEntity<List<LocalDate>> getNonWorkingDays(@Valid RequestParams params) {
     log.debug("Getting non-working days");
-    List<LocalDate> nonWorkingDays = adminSettingService.getNonWorkingDays();
+    List<LocalDate> nonWorkingDays = adminSettingService.getNonWorkingDays(params.degreeId());
     return ResponseEntity.ok(nonWorkingDays);
   }
 
@@ -128,10 +131,11 @@ public class AdminSettingController {
   })
   @PreAuthorize(value = "hasAuthority('ADMIN')")
   public ResponseEntity<Void> putNonWorkingDays(
+      @Valid RequestParams params,
       @RequestBody @Valid @Parameter(description = "Обновленный список нерабочих дней", required = true)
       List<LocalDate> updatedNonWorkingDays) {
     log.info("Updating non-working days, count: {}", updatedNonWorkingDays.size());
-    adminSettingService.updateNonWorkingDays(updatedNonWorkingDays);
+    adminSettingService.updateNonWorkingDays(params.degreeId(), updatedNonWorkingDays);
     log.info("Non-working days updated successfully");
     return ResponseEntity.ok().build();
   }
@@ -144,9 +148,9 @@ public class AdminSettingController {
       @ApiResponse(responseCode = "403", description = "Нет прав доступа")
   })
   @PreAuthorize("hasAnyAuthority('ADMIN', 'OPERATOR')")
-  public ResponseEntity<List<ExcludedSlotSettingsDto>> getExcludedSlots() {
+  public ResponseEntity<List<ExcludedSlotSettingsDto>> getExcludedSlots(@Valid RequestParams params) {
     log.debug("Getting excluded slots");
-    return ResponseEntity.ok(adminSettingService.getExcludedSlots());
+    return ResponseEntity.ok(adminSettingService.getExcludedSlots(params.degreeId()));
   }
 
   @PostMapping("/excluded-slots")
@@ -159,10 +163,11 @@ public class AdminSettingController {
   })
   @PreAuthorize(value = "hasAuthority('ADMIN')")
   public ResponseEntity<Void> createExcludedSlot(
+      @Valid RequestParams params,
       @RequestBody @Valid @Parameter(description = "Данные исключенного слота", required = true)
       ExcludedSlotSettingsDto excludedSlotSettingsDto) {
     log.info("Creating excluded slot");
-    adminSettingService.createExcludedSlot(excludedSlotSettingsDto);
+    adminSettingService.createExcludedSlot(params.degreeId(), excludedSlotSettingsDto);
     log.info("Excluded slot created successfully");
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
@@ -177,10 +182,19 @@ public class AdminSettingController {
   })
   @PreAuthorize(value = "hasAuthority('ADMIN')")
   public ResponseEntity<Void> deleteExcludedSlot(
+      @Valid RequestParams params,
       @PathVariable @Parameter(description = "ID исключенного слота", required = true) Long id) {
     log.info("Deleting excluded slot with ID: {}", id);
-    adminSettingService.deleteExcludedSlot(id);
+    adminSettingService.deleteExcludedSlot(params.degreeId(), id);
     log.info("Excluded slot deleted successfully with ID: {}", id);
     return ResponseEntity.ok().build();
+  }
+
+  public record RequestParams(
+      @RequestParam
+      @NotNull(message = "Не передан идентификатор программы образования")
+      Long degreeId
+  ) {
+
   }
 }

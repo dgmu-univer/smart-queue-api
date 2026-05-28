@@ -28,7 +28,7 @@ public class SlotServiceImpl implements SlotService {
     try {
       log.debug("Getting slots with filter: {}", filter);
 
-      var slotSettings = adminSettingService.getSlotSettings();
+      var slotSettings = adminSettingService.getSlotSettings(filter.degreeId());
       var dateStart = (filter.date() != null) ? filter.date().atStartOfDay() : null;
       var dateEnd = (filter.date() != null) ? filter.date().atTime(23, 59, 59) : null;
       boolean isBooked = filter.booked() == null || filter.booked();

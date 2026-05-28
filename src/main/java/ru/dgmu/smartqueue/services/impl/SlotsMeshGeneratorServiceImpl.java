@@ -25,7 +25,7 @@ public class SlotsMeshGeneratorServiceImpl {
 
     // Группируем исключения по датам для быстрой проверки
     var exclusionsByDate = excludedSlots.stream()
-        .collect(Collectors.groupingBy(dto -> LocalDate.parse(dto.date())));
+        .collect(Collectors.groupingBy(ExcludedSlotSettingsDto::date));
 
     // Группируем занятые слоты по датам (избегаем O(N) перебора для каждого минутного шага)
     var appointmentsByDate = hadAppointmentsSlots.stream()
@@ -67,8 +67,8 @@ public class SlotsMeshGeneratorServiceImpl {
 
         // 1. Проверка пересечения с административными исключениями
         boolean intersectsWithExclusion = dailyExclusions.stream().anyMatch(ex -> {
-          LocalTime exStart = LocalTime.parse(ex.startTime());
-          LocalTime exEnd = LocalTime.parse(ex.endTime());
+          LocalTime exStart = ex.startTime();
+          LocalTime exEnd = ex.endTime();
           return current.isBefore(exEnd) && end.isAfter(exStart);
         });
 
