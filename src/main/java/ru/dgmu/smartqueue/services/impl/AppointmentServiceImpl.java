@@ -5,6 +5,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dgmu.smartqueue.dtos.AppointmentDto;
@@ -28,7 +31,11 @@ import ru.dgmu.smartqueue.services.impl.OneTimeTokenGenerator.VerificationCode;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AppointmentServiceImpl implements AppointmentService {
+
+  @Value("${app.appointments.ttl-minutes:15}")
+  private long ttlMinutes;
 
   private final SlotRepository slotRepository;
   private final AppointmentRepository appointmentRepository;
@@ -119,14 +126,27 @@ public class AppointmentServiceImpl implements AppointmentService {
     );
   }
 
-  // todo шедуллер который будет выгребать все устаревшие не верефицированные соты
+  @Scheduled(cron = "0 * * * * *")
+  @Transactional
+  public void cleanupExpiredAppointments() {
+    try {
+      log.info("Запуск шедуллера очистки просроченных броней...");
+      LocalDateTime cutoffTime = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(ttlMinutes);
+      int deletedCount = appointmentRepository.deleteExpiredUnverifiedAppointments(cutoffTime);
+      if (deletedCount > 0) {
+        log.info("Шедуллер успешно удалил {} неверифицированных записей, созданных до {}",
+            deletedCount, cutoffTime);
+      } else {
+        log.debug("Просроченных неверифицированных записей не обнаружено");
+      }
+    } catch (Exception e) {
+      log.error("Ошибка при очистке просроченных броней", e);
+    }
+  }
 
-  // todo подумать как сделать недоступность слотов которые уже переполнены даже если appointment not verified
   private Appointment buildEntity(AppointmentsRequestDto requestDto,
       VerificationCode verificationCode, Slot slot) {
     return new Appointment(null, verificationCode.value(), requestDto.phone(), Boolean.FALSE,
         LocalDateTime.now(ZoneOffset.UTC), slot);
   }
-
-  // todo удаление слота сразу же как прошел таймер если человек не подтвердил его
 }

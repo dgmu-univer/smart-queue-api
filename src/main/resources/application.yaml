@@ -35,3 +35,7 @@ server:
       tracking-modes: cookie
       cookie:
         path: /
+
+app:
+  appointments:
+    ttl-minutes: ${APPOINTMENTS_TTL_MINUTES:5}

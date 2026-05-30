@@ -69,9 +69,4 @@ public class AppointmentsController {
       @Parameter(name = "Программа образования") @RequestParam Long degreeId) {
     return ResponseEntity.ok(appointmentService.getAllByFilter(from, to, degreeId));
   }
-
-  // TODO: Реализовать методы для работы с записями
-  // - Получение свободных слотов с учетом количества, обедов и исключительных дней
-  // - Отмена записи
-  // - Получение записей по фильтру
 }

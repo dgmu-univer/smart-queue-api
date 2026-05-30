@@ -1,6 +1,7 @@
 package ru.dgmu.smartqueue.repositories;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -33,4 +34,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
   @Modifying
   @Query("DELETE FROM Appointment a WHERE a.slot.degreeProgram.id = :degreeId AND a.phone = :phone")
   void deleteByDegreeIdAndPhone(@Param("degreeId") Long degreeId, @Param("phone") String phone);
+
+  @Modifying
+  @Query("DELETE FROM Appointment a WHERE a.isVerified = false AND a.requestedAt < :expireTime")
+  int deleteExpiredUnverifiedAppointments(@Param("expireTime") LocalDateTime expireTime);
 }
