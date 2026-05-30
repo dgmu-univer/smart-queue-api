@@ -1,6 +1,5 @@
 package ru.dgmu.smartqueue.services.impl;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -8,12 +7,15 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.dgmu.smartqueue.dtos.AppointmentDto;
 import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
 import ru.dgmu.smartqueue.dtos.AppointmentsRequestDto;
 import ru.dgmu.smartqueue.dtos.CalendarAppointmentsResponseDto;
 import ru.dgmu.smartqueue.entites.Appointment;
 import ru.dgmu.smartqueue.entites.Slot;
+import ru.dgmu.smartqueue.enums.RESOURCE;
 import ru.dgmu.smartqueue.exception.IncorrectVerificationCode;
+import ru.dgmu.smartqueue.exception.ResourceNotFoundException;
 import ru.dgmu.smartqueue.exception.SlotExpired;
 import ru.dgmu.smartqueue.exception.SlotOverflowed;
 import ru.dgmu.smartqueue.repositories.AppointmentRepository;
@@ -37,11 +39,13 @@ public class AppointmentServiceImpl implements AppointmentService {
   public Long bookSlot(AppointmentsRequestDto requestDto) {
 //    validateOnExistAppointments(requestDto);
     validateBookingDateExpiring(requestDto);
-    VerificationCode verificationCode = OneTimeTokenGenerator.generateCode();
     Slot slot = slotRepository.getSlotByStartTimeAtAndDegreeProgram_Id(
-        LocalDateTime.of(requestDto.date(),
-            requestDto.time()).atZone(ZoneOffset.UTC).toLocalDateTime(),
-        requestDto.degreeId()).orElseThrow(EntityNotFoundException::new);
+            LocalDateTime.of(requestDto.date(),
+                requestDto.time()).atZone(ZoneOffset.UTC).toLocalDateTime(), requestDto.degreeId())
+        .orElseThrow(() -> new ResourceNotFoundException(
+            "Ресурс: 'Слот' для уровня образования с идентификатором: %s и на время %s не найден".formatted(
+                requestDto.degreeId(), requestDto.date())));
+    VerificationCode verificationCode = OneTimeTokenGenerator.generateCode();
     Appointment appointment = buildEntity(requestDto, verificationCode, slot);
     Appointment notVerifiedAppointment = appointmentRepository.save(appointment);
     if (isSlotAlreadyOverflowed(appointment)) {
@@ -63,31 +67,34 @@ public class AppointmentServiceImpl implements AppointmentService {
 
   private void validateBookingDateExpiring(AppointmentsRequestDto requestDto) {
     if (requestDto.date().isBefore(LocalDate.now())) {
-      throw new SlotExpired("Вы не можете записаться в слот с временем начала ранее текущего времени");
+      throw new SlotExpired(
+          "Вы не можете записаться в слот с временем начала ранее текущего времени");
     }
   }
 
   private boolean isSlotAlreadyOverflowed(Appointment appointment) {
-    var slotSettings = adminSettingService.getSlotSettings(appointment.getSlot().getDegreeProgram().getId());
+    var slotSettings = adminSettingService.getSlotSettings(
+        appointment.getSlot().getDegreeProgram().getId());
     List<Appointment> appointments = appointment.getSlot().getAppointments();
     return appointments.size() >= slotSettings.capacityPerSlot();
   }
 
   @Override
   @Transactional
-  public Appointment verifyAppointment(AppointmentVerificationRequest verificationRequest) {
+  public AppointmentDto verifyAppointment(AppointmentVerificationRequest verificationRequest) {
     Appointment appointment = appointmentRepository.getReferenceById(verificationRequest.id());
     if (appointment.getPin().equals(verificationRequest.verificationCode())) {
       appointment.setIsVerified(Boolean.TRUE);
     } else {
       throw new IncorrectVerificationCode("Неверный код верификации");
     }
-    return appointmentRepository.save(appointment);
+    return AppointmentDto.fromEntity(appointmentRepository.save(appointment));
   }
 
   @Override
-  public Appointment getTets(Long id) {
-    return appointmentRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+  public AppointmentDto getTets(Long id) {
+    return AppointmentDto.fromEntity(appointmentRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException(RESOURCE.APPOINTMENT, id)));
   }
 
   @Override

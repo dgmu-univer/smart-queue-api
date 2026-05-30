@@ -7,7 +7,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 public class OneTimeTokenGenerator {
 
   public static VerificationCode generateCode() {
-    return new VerificationCode(RandomStringUtils.secure().nextNumeric(6));
+    return new VerificationCode(RandomStringUtils.secure().nextNumeric(4));
   }
 
   public record VerificationCode(

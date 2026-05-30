@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.dgmu.smartqueue.controllers.SlotController.SlotFilter;
-import ru.dgmu.smartqueue.dtos.SlotResponse;
 import ru.dgmu.smartqueue.entites.Slot;
+import ru.dgmu.smartqueue.exception.ResourceNotFoundException;
 import ru.dgmu.smartqueue.repositories.SlotRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
 import ru.dgmu.smartqueue.services.SlotService;
@@ -24,7 +24,7 @@ public class SlotServiceImpl implements SlotService {
   /**
    * Получение слотов по фильтру
    */
-  public SlotResponse getSlotsByFilter(SlotFilter filter) {
+  public List<LocalTime> getSlotsByFilter(SlotFilter filter) {
     try {
       log.debug("Getting slots with filter: {}", filter);
 
@@ -42,11 +42,13 @@ public class SlotServiceImpl implements SlotService {
           .toList();
 
       log.debug("Found {} slots matching filter", result.size());
-      return new SlotResponse(result);
-
+      return result;
+    } catch (ResourceNotFoundException e) {
+      log.error("Resource not found by filter: {}", filter, e);
+      return List.of();
     } catch (Exception e) {
       log.error("Error getting slots by filter: {}", filter, e);
-      throw new RuntimeException("Ошибка при получении слотов", e);
+      throw e;
     }
   }
 }

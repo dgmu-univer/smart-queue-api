@@ -1,6 +1,5 @@
 package ru.dgmu.smartqueue.exception;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -8,9 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 @Slf4j
@@ -43,13 +44,6 @@ public class GlobalExceptionHandler {
     log.warn("Authentication failed: {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
         .body(new ApiError(e.getMessage(), HttpStatus.UNAUTHORIZED.value()));
-  }
-
-  @ExceptionHandler(EntityNotFoundException.class)
-  public ResponseEntity<ApiError> handleEntityNotFoundException(EntityNotFoundException e) {
-    log.warn("Entity not found: {}", e.getMessage());
-    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body(new ApiError("Запрашиваемый ресурс не найден", HttpStatus.NOT_FOUND.value()));
   }
 
   @ExceptionHandler(DataIntegrityViolationException.class)
@@ -98,6 +92,20 @@ public class GlobalExceptionHandler {
     log.warn("Invalid argument: {}", e.getMessage());
     return ResponseEntity.badRequest()
         .body(new ApiError("Неверные параметры запроса", HttpStatus.BAD_REQUEST.value()));
+  }
+
+  @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+  public ResponseEntity<ApiError> handleNotAllowedMethodException(HttpRequestMethodNotSupportedException e) {
+    log.error("Not allowed method", e);
+    return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+        .body(new ApiError("HTTP метод не поддерживается", HttpStatus.METHOD_NOT_ALLOWED.value()));
+  }
+
+  @ExceptionHandler(NoResourceFoundException.class)
+  public ResponseEntity<ApiError> handleNoResourceException(NoResourceFoundException e) {
+    log.error("Not found resource", e);
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(new ApiError("Запрашиваемый ресурс не найден", HttpStatus.NOT_FOUND.value()));
   }
 
   @ExceptionHandler(Exception.class)

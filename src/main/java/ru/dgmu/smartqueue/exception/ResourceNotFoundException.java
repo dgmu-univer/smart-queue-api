@@ -1,15 +1,14 @@
 package ru.dgmu.smartqueue.exception;
 
-/**
- * Исключение для случаев, когда запрашиваемый ресурс не найден
- */
+import ru.dgmu.smartqueue.enums.RESOURCE;
+
 public class ResourceNotFoundException extends BusinessException {
 
   public ResourceNotFoundException(String message) {
     super(message);
   }
 
-  public ResourceNotFoundException(String resourceType, Object id) {
-    super(String.format("%s с ID %s не найден", resourceType, id));
+  public ResourceNotFoundException(RESOURCE resource, Object id) {
+    super(String.format("Ресурс: '%s' с идентификатором: %s не найден", resource.getDisplayName(), id));
   }
 }

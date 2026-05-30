@@ -69,7 +69,7 @@ public class OperatorLoginController {
     } catch (Exception e) {
       log.error("Unexpected error during operator authentication", e);
       SecurityContextHolder.clearContext();
-      throw new RuntimeException("Ошибка при аутентификации оператора");
+      throw new AuthenticationFailedException("Ошибка при аутентификации оператора");
     }
   }
 }

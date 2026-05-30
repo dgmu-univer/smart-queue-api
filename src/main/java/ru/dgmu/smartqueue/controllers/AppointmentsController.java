@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.dgmu.smartqueue.dtos.AppointmentDto;
 import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
 import ru.dgmu.smartqueue.dtos.AppointmentsRequestDto;
 import ru.dgmu.smartqueue.dtos.CalendarAppointmentsResponseDto;
-import ru.dgmu.smartqueue.entites.Appointment;
 import ru.dgmu.smartqueue.services.AppointmentService;
 
 @RestController
@@ -35,17 +35,16 @@ public class AppointmentsController {
     return ResponseEntity.ok(appointmentService.bookSlot(requestDto));
   }
 
-  // todo на дто поменять
   @PostMapping("/public/appointments/verification")
   @Operation(summary = "Верификация записи в слот", description = "Верифицирует запись")
-  public ResponseEntity<Appointment> verify(
+  public ResponseEntity<AppointmentDto> verify(
       @RequestBody @Valid AppointmentVerificationRequest verificationRequest) {
     return ResponseEntity.ok(appointmentService.verifyAppointment(verificationRequest));
   }
 
   @GetMapping("/public/appointments/{id}")
   @Operation(summary = "Тестовый эндпоинт возвращения всех записей", description = "Возвращает все записи в табилце")
-  public ResponseEntity<Appointment> getAll(@PathVariable Long id) {
+  public ResponseEntity<AppointmentDto> getAll(@PathVariable Long id) {
     return ResponseEntity.ok(appointmentService.getTets(id));
   }
 

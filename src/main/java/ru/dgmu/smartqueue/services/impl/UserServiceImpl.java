@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.dgmu.smartqueue.entites.User;
+import ru.dgmu.smartqueue.exception.AuthenticationFailedException;
 import ru.dgmu.smartqueue.repositories.UserRepository;
 import ru.dgmu.smartqueue.services.UserService;
 
@@ -17,7 +18,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public User create(User user) {
     if (repository.existsByUsername(user.getUsername())) {
-      throw new RuntimeException("Пользователь с таким именем уже существует");
+      throw new AuthenticationFailedException("Пользователь с таким именем уже существует");
     }
     return repository.save(user);
   }
