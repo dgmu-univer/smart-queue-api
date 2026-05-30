@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dgmu.smartqueue.dtos.AppointmentDto;
 import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
+import ru.dgmu.smartqueue.dtos.AppointmentsExistingValidationRequestDto;
 import ru.dgmu.smartqueue.dtos.AppointmentsRequestDto;
 import ru.dgmu.smartqueue.dtos.CalendarAppointmentsResponseDto;
 import ru.dgmu.smartqueue.entites.Appointment;
 import ru.dgmu.smartqueue.entites.Slot;
 import ru.dgmu.smartqueue.enums.Resource;
-import ru.dgmu.smartqueue.exception.AlreadyHasAppointment;
 import ru.dgmu.smartqueue.exception.IncorrectVerificationCode;
 import ru.dgmu.smartqueue.exception.ResourceNotFoundException;
 import ru.dgmu.smartqueue.exception.SlotExpired;
@@ -38,7 +38,6 @@ public class AppointmentServiceImpl implements AppointmentService {
   @Override
   @Transactional
   public Long bookSlot(AppointmentsRequestDto requestDto) {
-    validateOnExistAppointments(requestDto.degreeId(), requestDto.phone());
     validateBookingDateExpiring(requestDto.date());
     Slot slot = slotRepository.getSlotByStartTimeAtAndDegreeProgram_Id(
             LocalDateTime.of(requestDto.date(),
@@ -47,6 +46,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             "Ресурс: 'Слот' для уровня образования с идентификатором: %s и на время %s не найден".formatted(
                 requestDto.degreeId(), requestDto.date())));
     VerificationCode verificationCode = OneTimeTokenGenerator.generateCode();
+    appointmentRepository.deleteByDegreeIdAndPhone(requestDto.degreeId(), requestDto.phone());
     Appointment appointment = buildEntity(requestDto, verificationCode, slot);
     Appointment notVerifiedAppointment = appointmentRepository.save(appointment);
     if (isSlotAlreadyOverflowed(appointment)) {
@@ -55,14 +55,6 @@ public class AppointmentServiceImpl implements AppointmentService {
     mobileVerificationSenderService.sendVerificationCode(notVerifiedAppointment.getPhone(),
         notVerifiedAppointment.getPin());
     return notVerifiedAppointment.getId();
-  }
-
-  private void validateOnExistAppointments(Long degreeId, String phone) {
-    boolean isAlreadyHasAppointment = appointmentRepository.existsBySlot_DegreeProgram_IdAndPhone(
-        degreeId, phone);
-    if (isAlreadyHasAppointment) {
-      throw new AlreadyHasAppointment();
-    }
   }
 
   private void validateBookingDateExpiring(LocalDate date) {
@@ -110,6 +102,12 @@ public class AppointmentServiceImpl implements AppointmentService {
   @Override
   public long countByDegreeAndDate(Long degreeId, LocalDate date) {
     return appointmentRepository.countByDateAndDegreeProgramId(date, degreeId);
+  }
+
+  @Override
+  public boolean checkExisting(AppointmentsExistingValidationRequestDto requestDto) {
+    return appointmentRepository.existsBySlot_DegreeProgram_IdAndPhone(requestDto.degreeId(),
+        requestDto.phone());
   }
 
   CalendarAppointmentsResponseDto buildCalendarResponseDto(Appointment appointment) {

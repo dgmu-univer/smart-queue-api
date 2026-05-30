@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.dgmu.smartqueue.dtos.AppointmentDto;
+import ru.dgmu.smartqueue.dtos.AppointmentExistingValidationResponseDto;
 import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
+import ru.dgmu.smartqueue.dtos.AppointmentsExistingValidationRequestDto;
 import ru.dgmu.smartqueue.dtos.AppointmentsRequestDto;
 import ru.dgmu.smartqueue.dtos.CalendarAppointmentsResponseDto;
 import ru.dgmu.smartqueue.services.AppointmentService;
@@ -24,6 +27,7 @@ import ru.dgmu.smartqueue.services.AppointmentService;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 @Tag(name = "Appointments", description = "Управление записями")
 public class AppointmentsController {
 
@@ -33,6 +37,15 @@ public class AppointmentsController {
   @Operation(summary = "Запись в слот", description = "Создает новую неверефицированную запись")
   public ResponseEntity<Long> bookSlot(@RequestBody @Valid AppointmentsRequestDto requestDto) {
     return ResponseEntity.ok(appointmentService.bookSlot(requestDto));
+  }
+
+  @PostMapping("/public/appointments/existing-validation")
+  @Operation(summary = "Проверка на существование ранее созданных записей по номеру телефона и программе образования",
+      description = "Проверяет наличие записей по номеру телефона и программе образования")
+  public ResponseEntity<AppointmentExistingValidationResponseDto> checkExisting(@RequestBody @Valid
+      AppointmentsExistingValidationRequestDto requestDto) {
+    return ResponseEntity.ok(new AppointmentExistingValidationResponseDto(
+        appointmentService.checkExisting(requestDto)));
   }
 
   @PostMapping("/public/appointments/verification")
