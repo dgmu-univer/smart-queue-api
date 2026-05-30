@@ -84,7 +84,6 @@ public class AuthController {
       return ResponseEntity.ok().build();
     } catch (Exception e) {
       log.error("Error during logout", e);
-      // Даже если произошла ошибка, очищаем контекст безопасности
       SecurityContextHolder.clearContext();
       return ResponseEntity.ok().build();
     }

@@ -2,6 +2,7 @@ package ru.dgmu.smartqueue.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -24,6 +25,7 @@ import ru.dgmu.smartqueue.services.DegreeProgramService;
 @Tag(name = "Degree programs", description = "Управление программами образования")
 @RequiredArgsConstructor
 @Slf4j
+@SecurityRequirement(name = "bearerAuth")
 public class DegreeProgramController {
 
   private final DegreeProgramService degreeProgramService;

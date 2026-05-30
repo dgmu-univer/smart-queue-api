@@ -1,15 +1,12 @@
 package ru.dgmu.smartqueue.exception;
 
-/**
- * Базовое исключение для бизнес-логики приложения
- */
-public class BusinessException extends RuntimeException {
+public abstract class BusinessException extends RuntimeException {
 
-  public BusinessException(String message) {
+  BusinessException(String message) {
     super(message);
   }
 
-  public BusinessException(String message, Throwable cause) {
+  BusinessException(String message, Throwable cause) {
     super(message, cause);
   }
 }

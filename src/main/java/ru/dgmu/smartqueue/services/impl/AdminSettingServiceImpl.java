@@ -1,22 +1,19 @@
 package ru.dgmu.smartqueue.services.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.dgmu.smartqueue.dtos.AdminSettingsDto;
 import ru.dgmu.smartqueue.dtos.ExcludedSlotSettingsDto;
 import ru.dgmu.smartqueue.dtos.PeriodSettingsDto;
 import ru.dgmu.smartqueue.dtos.SlotSettingsDto;
 import ru.dgmu.smartqueue.entites.AdminSetting;
-import ru.dgmu.smartqueue.enums.AdminSettingResourceEnum;
+import ru.dgmu.smartqueue.entites.ExcludedSlot;
+import ru.dgmu.smartqueue.enums.Resource;
+import ru.dgmu.smartqueue.exception.ResourceNotFoundException;
 import ru.dgmu.smartqueue.repositories.AdminSettingsRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
 import ru.dgmu.smartqueue.services.SlotGenerationService;
@@ -26,136 +23,123 @@ import ru.dgmu.smartqueue.services.SlotGenerationService;
 @Slf4j
 public class AdminSettingServiceImpl implements AdminSettingService {
 
-  private final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
-
   private final AdminSettingsRepository repository;
-  //  private final SlotService slotService;
   private final SlotGenerationService slotGenerationService;
 
   @Override
-  public PeriodSettingsDto getPeriodSettings() {
-    return repository.findById(AdminSettingResourceEnum.PERIODS)
-        .map(entity -> mapper.convertValue(entity.getSettings(), PeriodSettingsDto.class))
-        .orElseThrow(() -> new EntityNotFoundException("Period settings not found"));
+  public AdminSettingsDto getAdminSettings(Long degreeId) {
+    return repository.findByDegreeProgramId(degreeId)
+        .map(AdminSettingsDto::fromEntity)
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
+  }
+
+  @Override
+  public PeriodSettingsDto getPeriodSettings(Long degreeId) {
+    return repository.findByDegreeProgramId(degreeId)
+        .map(PeriodSettingsDto::fromEntity)
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
   }
 
   @Override
   @Transactional
-  public void updatePeriodSettings(String jsonPatch) throws JsonProcessingException {
-    var currentSettings = getPeriodSettings();
-    var updatedSettings = mapper.readerForUpdating(currentSettings)
-        .readValue(jsonPatch);
-    AdminSetting entity = repository.findById(AdminSettingResourceEnum.PERIODS)
-        .orElseThrow(() -> new EntityNotFoundException("Period settings not found"));
-    entity.setSettings(updatedSettings);
-    repository.save(entity);
-    regenerageUnbookedSlots();
-  }
+  public void updatePeriodSettings(Long degreeId, PeriodSettingsDto periodSettingsDto) {
+    AdminSetting entity = repository.findByDegreeProgramId(degreeId)
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
 
-  @Override
-  public SlotSettingsDto getSlotSettings() {
-    return repository.findById(AdminSettingResourceEnum.SLOTS)
-        .map(entity -> mapper.convertValue(entity.getSettings(), SlotSettingsDto.class))
-        .orElseThrow(() -> new EntityNotFoundException("Slots settings not found"));
-  }
-
-  @Override
-  @Transactional
-  public void updateSlotSettings(SlotSettingsDto updatedSlotSettingsDto) {
-    AdminSetting entity = repository.findById(AdminSettingResourceEnum.SLOTS)
-        .orElseThrow(() -> new EntityNotFoundException("Slot settings not found"));
-    SlotSettingsDto current = mapper.convertValue(entity.getSettings(), SlotSettingsDto.class);
-    SlotSettingsDto merged = current.merge(updatedSlotSettingsDto);
-    entity.setSettings(merged);
-    repository.save(entity);
-    regenerageUnbookedSlots();
-  }
-
-  @Override
-  public List<LocalDate> getNonWorkingDays() {
-    return repository.findById(AdminSettingResourceEnum.NON_WORKING_DAYS)
-        .map(entity -> mapper.convertValue(entity.getSettings(),
-            new TypeReference<List<LocalDate>>() {
-            }))
-        .orElseThrow(() -> new EntityNotFoundException("Non working days settings not found"));
-  }
-
-  @Override
-  @Transactional
-  public void updateNonWorkingDays(List<LocalDate> updatedNonWorkingDays) {
-    AdminSetting entity = repository.findById(AdminSettingResourceEnum.NON_WORKING_DAYS)
-        .orElseThrow(() -> new EntityNotFoundException("Non working days settings not found"));
-    entity.setSettings(updatedNonWorkingDays);
-    repository.save(entity);
-    regenerageUnbookedSlots();
-  }
-
-  @Override
-  public List<ExcludedSlotSettingsDto> getExcludedSlots() {
-    return repository.findById(AdminSettingResourceEnum.EXCLUDED_SLOTS)
-        .map(entity -> mapper.convertValue(
-            entity.getSettings(),
-            new TypeReference<List<ExcludedSlotSettingsDto>>() {
-            }
-        ))
-        .orElse(Collections.emptyList());
-  }
-
-  @Override
-  @Transactional
-  public void createExcludedSlot(
-      ExcludedSlotSettingsDto excludedSlotSettingsDto) {
-    AdminSetting entity = repository.findById(AdminSettingResourceEnum.EXCLUDED_SLOTS)
-        .orElseGet(() -> {
-          AdminSetting s = new AdminSetting();
-          s.setResource(AdminSettingResourceEnum.EXCLUDED_SLOTS);
-          return s;
-        });
-
-    List<ExcludedSlotSettingsDto> list;
-    if (entity.getSettings() == null) {
-      list = new ArrayList<>();
-    } else {
-      list = mapper.convertValue(entity.getSettings(), new TypeReference<>() {
-      });
+    if (periodSettingsDto.getWorkDate() != null) {
+      entity.setWorkStartDate(periodSettingsDto.getWorkDate().getStartDate());
+      entity.setWorkEndDate(periodSettingsDto.getWorkDate().getEndDate());
+    }
+    if (periodSettingsDto.getWorkTime() != null) {
+      entity.setWorkStartTime(periodSettingsDto.getWorkTime().getStartTime());
+      entity.setWorkEndTime(periodSettingsDto.getWorkTime().getEndTime());
+    }
+    if (periodSettingsDto.getLunch() != null) {
+      entity.setLunchStartTime(periodSettingsDto.getLunch().getStartTime());
+      entity.setLunchEndTime(periodSettingsDto.getLunch().getEndTime());
     }
 
-    list.add(excludedSlotSettingsDto.withId(System.currentTimeMillis()));
-
-    entity.setSettings(list);
     repository.save(entity);
-    regenerageUnbookedSlots();
+    regenerageUnbookedSlots(degreeId);
+  }
+
+  @Override
+  public SlotSettingsDto getSlotSettings(Long degreeId) {
+    return repository.findByDegreeProgramId(degreeId)
+        .map(SlotSettingsDto::fromEntity)
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
   }
 
   @Override
   @Transactional
-  public void deleteExcludedSlot(Long id) {
-    AdminSetting entity = repository.findById(AdminSettingResourceEnum.EXCLUDED_SLOTS)
-        .orElseThrow(() -> new EntityNotFoundException("Exclude slot settings not found"));
-
-    if (entity.getSettings() == null) {
-      throw new EntityNotFoundException("Exclude slot settings not found");
+  public void updateSlotSettings(Long degreeId, SlotSettingsDto updatedSlotSettingsDto) {
+    AdminSetting entity = repository.findByDegreeProgramId(degreeId)
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
+    if (updatedSlotSettingsDto.capacityPerSlot() != null) {
+      entity.setCapacityPerSlot(updatedSlotSettingsDto.capacityPerSlot());
     }
-
-    List<ExcludedSlotSettingsDto> list = mapper.convertValue(entity.getSettings(),
-        new TypeReference<>() {
-        });
-    list.removeIf(slot -> slot.id().equals(id));
-    entity.setSettings(list);
+    if (updatedSlotSettingsDto.durationMinutes() != null) {
+      entity.setDurationMinutes(updatedSlotSettingsDto.durationMinutes());
+    }
     repository.save(entity);
-
-    regenerageUnbookedSlots();
+    regenerageUnbookedSlots(degreeId);
   }
 
-  public void regenerageUnbookedSlots() {
-    var periodSettings = getPeriodSettings();
-    var slotSettings = getSlotSettings();
-    var nonWorkingDays = getNonWorkingDays();
-    var excludedSlots = getExcludedSlots();
-    slotGenerationService.generateAndSaveWithSkipBooked(periodSettings, slotSettings,
-        nonWorkingDays, excludedSlots);
+  @Override
+  public List<LocalDate> getNonWorkingDays(Long degreeId) {
+    return repository.findByDegreeProgramId(degreeId)
+        .map(AdminSetting::getNonWorkingDays)
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
   }
 
-  // todo убрать этот слой
-  // todo связать слоты с направлением
+  @Override
+  @Transactional
+  public void updateNonWorkingDays(Long degreeId, List<LocalDate> updatedNonWorkingDays) {
+    AdminSetting entity = repository.findByDegreeProgramId(degreeId)
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
+    entity.setNonWorkingDays(updatedNonWorkingDays);
+    repository.save(entity);
+    regenerageUnbookedSlots(degreeId);
+  }
+
+  @Override
+  public List<ExcludedSlotSettingsDto> getExcludedSlots(Long degreeId) {
+    List<ExcludedSlot> excludedSlots = repository.findByDegreeProgramId(degreeId)
+        .map(AdminSetting::getExcludedSlots)
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
+    return excludedSlots.stream()
+        .map(ExcludedSlotSettingsDto::fromEntity)
+        .toList();
+  }
+
+  @Override
+  @Transactional
+  public void createExcludedSlot(Long degreeId, ExcludedSlotSettingsDto excludedSlotSettingsDto) {
+    AdminSetting entity = repository.findByDegreeProgramId(degreeId)
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
+    entity.getExcludedSlots()
+        .add(excludedSlotSettingsDto.withId(System.currentTimeMillis()).toEntity());
+    repository.save(entity);
+    regenerageUnbookedSlots(degreeId);
+  }
+
+  @Override
+  @Transactional
+  public void deleteExcludedSlot(Long degreeId, Long id) {
+    AdminSetting settings = repository.findByDegreeProgramId(degreeId)
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
+    boolean removed = settings.getExcludedSlots().removeIf(slot -> slot.getId().equals(id));
+    if (!removed) {
+      throw new ResourceNotFoundException(Resource.EXCLUDED_SLOT, id);
+    }
+    repository.save(settings);
+    regenerageUnbookedSlots(degreeId);
+  }
+
+  private void regenerageUnbookedSlots(Long degreeId) {
+    AdminSettingsDto adminSettings = getAdminSettings(degreeId);
+    slotGenerationService.generateAndSaveWithSkipBooked(adminSettings.periods(),
+        adminSettings.slots(), adminSettings.nonWorkingDays(),
+        adminSettings.excludedSlots(), degreeId);
+  }
 }

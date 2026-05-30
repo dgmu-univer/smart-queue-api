@@ -1,11 +1,26 @@
 package ru.dgmu.smartqueue.dtos;
 
-import ru.dgmu.smartqueue.entites.Slot;
+import java.time.LocalDateTime;
+import ru.dgmu.smartqueue.entites.Appointment;
 
 public record AppointmentDto(
     Long id,
     String pin,
-    Slot slotId
+    String phone,
+    Boolean isVerified,
+    LocalDateTime requestedAt,
+    SlotDto slot
 ) {
+
+  public static AppointmentDto fromEntity(Appointment entity) {
+    return new AppointmentDto(
+        entity.getId(),
+        entity.getPin(),
+        entity.getPhone(),
+        entity.getIsVerified(),
+        entity.getRequestedAt(),
+        SlotDto.fromEntity(entity.getSlot())
+    );
+  }
 
 }

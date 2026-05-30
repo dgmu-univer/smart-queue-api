@@ -11,7 +11,7 @@ public interface SlotGenerationService {
 
   void generateAndSaveWithSkipBooked(PeriodSettingsDto periodSettings,
       SlotSettingsDto slotSettings, List<LocalDate> nonWorkingDays,
-      List<ExcludedSlotSettingsDto> excludedSlots);
+      List<ExcludedSlotSettingsDto> excludedSlots, Long degreeId);
 
   void generateAndSaveNewDegree(PeriodSettingsDto periodSettings,
       SlotSettingsDto slotSettings, List<LocalDate> nonWorkingDays,

@@ -13,7 +13,9 @@ import ru.dgmu.smartqueue.dtos.SlotDto;
 import ru.dgmu.smartqueue.dtos.SlotSettingsDto;
 import ru.dgmu.smartqueue.entites.DegreeProgram;
 import ru.dgmu.smartqueue.entites.Slot;
+import ru.dgmu.smartqueue.enums.Resource;
 import ru.dgmu.smartqueue.exception.ResourceNotFoundException;
+import ru.dgmu.smartqueue.exception.SlotGenerationException;
 import ru.dgmu.smartqueue.repositories.DegreeProgramRepository;
 import ru.dgmu.smartqueue.repositories.SlotRepository;
 import ru.dgmu.smartqueue.services.SlotGenerationService;
@@ -33,18 +35,17 @@ public class SlotGenerationServiceImpl implements SlotGenerationService {
   @Transactional
   public void generateAndSaveWithSkipBooked(PeriodSettingsDto periodSettings,
       SlotSettingsDto slotSettings, List<LocalDate> nonWorkingDays,
-      List<ExcludedSlotSettingsDto> excludedSlots) {
-    var degreePrograms = degreeProgramRepository.findAll();
+      List<ExcludedSlotSettingsDto> excludedSlots, Long degreeId) {
+    var degreeProgram = degreeProgramRepository.findById(degreeId)
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
 
     var start = System.currentTimeMillis();
-    degreePrograms.forEach(degreeProgram -> {
-      var slotsWithAppointments = slotRepository.findSlotsWithAppointments(degreeProgram.getId());
-      var slots = generateSlotsForDegreeProgram(periodSettings, slotSettings, nonWorkingDays,
-          excludedSlots, degreeProgram, slotsWithAppointments);
-      slotRepository.deleteAllByDegreeProgram(degreeProgram.getId(),
-          slotsWithAppointments.stream().map(Slot::getId).toList());
-      slotRepository.saveAll(slots);
-    });
+    var slotsWithAppointments = slotRepository.findSlotsWithAppointments(degreeProgram.getId());
+    var slots = generateSlotsForDegreeProgram(periodSettings, slotSettings, nonWorkingDays,
+        excludedSlots, degreeProgram, slotsWithAppointments);
+    slotRepository.deleteAllByDegreeProgram(degreeProgram.getId(),
+        slotsWithAppointments.stream().map(Slot::getId).toList());
+    slotRepository.saveAll(slots);
     log.info("Generated slots in {} ms", System.currentTimeMillis() - start);
   }
 
@@ -86,8 +87,7 @@ public class SlotGenerationServiceImpl implements SlotGenerationService {
       throw e;
     } catch (Exception e) {
       log.error("Error generating slots mesh for degree program ID: {}", degreeProgramId, e);
-      throw new RuntimeException("Ошибка при генерации сетки слотов", e);
+      throw new SlotGenerationException("Ошибка при генерации сетки слотов", e);
     }
-
   }
 }

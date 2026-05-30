@@ -35,3 +35,11 @@ server:
       tracking-modes: cookie
       cookie:
         path: /
+
+app:
+  appointments:
+    ttl-minutes: ${APPOINTMENTS_TTL_MINUTES:5}
+  sms:
+    apiKey: ${SMS_API_KEY}
+    url: ${SMS_URL}
+    number: ${SMS_NUMBER}

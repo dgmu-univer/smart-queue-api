@@ -11,4 +11,5 @@
   <include file="changelog/004.add_pin_to_user_table.xml" relativeToChangelogFile="true"/>
   <include file="changelog/005.create_appointment_table.xml" relativeToChangelogFile="true"/>
   <include file="changelog/006.add_verified_to_appointment.xml" relativeToChangelogFile="true"/>
+  <include file="changelog/007.modify_appointments_table.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
