@@ -13,9 +13,9 @@ import ru.dgmu.smartqueue.dtos.SlotDto;
 import ru.dgmu.smartqueue.dtos.SlotSettingsDto;
 import ru.dgmu.smartqueue.entites.DegreeProgram;
 import ru.dgmu.smartqueue.entites.Slot;
-import ru.dgmu.smartqueue.enums.RESOURCE;
-import ru.dgmu.smartqueue.exception.BusinessException;
+import ru.dgmu.smartqueue.enums.Resource;
 import ru.dgmu.smartqueue.exception.ResourceNotFoundException;
+import ru.dgmu.smartqueue.exception.SlotGenerationException;
 import ru.dgmu.smartqueue.repositories.DegreeProgramRepository;
 import ru.dgmu.smartqueue.repositories.SlotRepository;
 import ru.dgmu.smartqueue.services.SlotGenerationService;
@@ -37,7 +37,7 @@ public class SlotGenerationServiceImpl implements SlotGenerationService {
       SlotSettingsDto slotSettings, List<LocalDate> nonWorkingDays,
       List<ExcludedSlotSettingsDto> excludedSlots, Long degreeId) {
     var degreeProgram = degreeProgramRepository.findById(degreeId)
-        .orElseThrow(() -> new ResourceNotFoundException(RESOURCE.DEGREE_PROGRAM, degreeId));
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
 
     var start = System.currentTimeMillis();
     var slotsWithAppointments = slotRepository.findSlotsWithAppointments(degreeProgram.getId());
@@ -87,7 +87,7 @@ public class SlotGenerationServiceImpl implements SlotGenerationService {
       throw e;
     } catch (Exception e) {
       log.error("Error generating slots mesh for degree program ID: {}", degreeProgramId, e);
-      throw new BusinessException("Ошибка при генерации сетки слотов", e);
+      throw new SlotGenerationException("Ошибка при генерации сетки слотов", e);
     }
   }
 }

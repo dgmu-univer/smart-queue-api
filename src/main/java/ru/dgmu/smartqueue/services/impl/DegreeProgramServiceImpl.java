@@ -3,6 +3,7 @@ package ru.dgmu.smartqueue.services.impl;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dgmu.smartqueue.dtos.AdminSettingsDto;
@@ -12,6 +13,7 @@ import ru.dgmu.smartqueue.dtos.DegreeProgramsWithPeriodDto;
 import ru.dgmu.smartqueue.entites.DegreeProgram;
 import ru.dgmu.smartqueue.entites.User;
 import ru.dgmu.smartqueue.enums.Role;
+import ru.dgmu.smartqueue.exception.DuplicateUserPinException;
 import ru.dgmu.smartqueue.repositories.DegreeProgramRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
 import ru.dgmu.smartqueue.services.DegreeProgramService;
@@ -60,16 +62,20 @@ public class DegreeProgramServiceImpl implements DegreeProgramService {
         .isEnabled(Boolean.TRUE)
         .role(Role.OPERATOR)
         .build());
-    var degreeProgram = degreeProgramRepository.save(degreeProgramDto.toEntity(user));
-    createSlots(degreeProgram);
+    try {
+      var degreeProgram = degreeProgramRepository.save(degreeProgramDto.toEntity(user));
+      createSlots(degreeProgram);
+    } catch (DataIntegrityViolationException e) {
+      throw new DuplicateUserPinException();
+    }
   }
 
   private void createSlots(DegreeProgram degreeProgram) {
     AdminSettingsDto adminSettingsDto = AdminSettingsDto.fromEntity(
         degreeProgram.getAdminSettings());
-    slotGenerationService.generateAndSaveNewDegree(adminSettingsDto.periodSettings(),
-        adminSettingsDto.slotSettings(), adminSettingsDto.nonWorkingDays(),
-        adminSettingsDto.excludedSlotSettings(), degreeProgram);
+    slotGenerationService.generateAndSaveNewDegree(adminSettingsDto.periods(),
+        adminSettingsDto.slots(), adminSettingsDto.nonWorkingDays(),
+        adminSettingsDto.excludedSlots(), degreeProgram);
   }
 
   @Override

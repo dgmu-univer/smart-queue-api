@@ -1,6 +1,7 @@
 package ru.dgmu.smartqueue.dtos;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -22,7 +23,8 @@ public record DegreeProgramDto(
     @Size(min = 6, max = 6, message = "Пин должен состоять из 6 сиволов")
     String pin,
     @NotNull(message = "Наличие настроек обязательно")
-    AdminSettingsDto adminSettings
+    @Valid
+    AdminSettingsDto settings
 ) {
 
   public static DegreeProgramDto fromEntity(DegreeProgram degreeProgram) {
@@ -49,12 +51,12 @@ public record DegreeProgramDto(
 
   public DegreeProgramPresentation toPresentation() {
     return new DegreeProgramPresentation(id, name, description,
-        adminSettings.periodSettings().getWorkDate());
+        settings.periods().getWorkDate());
   }
 
   public DegreeProgram toEntity(User user) {
     DegreeProgram degreeProgram = new DegreeProgram(null, name, description, user, null);
-    degreeProgram.setAdminSettings(adminSettings.toEntity(degreeProgram));
+    degreeProgram.setAdminSettings(settings.toEntity(degreeProgram));
     return degreeProgram;
   }
 

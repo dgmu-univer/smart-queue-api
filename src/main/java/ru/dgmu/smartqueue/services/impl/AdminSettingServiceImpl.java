@@ -12,7 +12,7 @@ import ru.dgmu.smartqueue.dtos.PeriodSettingsDto;
 import ru.dgmu.smartqueue.dtos.SlotSettingsDto;
 import ru.dgmu.smartqueue.entites.AdminSetting;
 import ru.dgmu.smartqueue.entites.ExcludedSlot;
-import ru.dgmu.smartqueue.enums.RESOURCE;
+import ru.dgmu.smartqueue.enums.Resource;
 import ru.dgmu.smartqueue.exception.ResourceNotFoundException;
 import ru.dgmu.smartqueue.repositories.AdminSettingsRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
@@ -30,21 +30,21 @@ public class AdminSettingServiceImpl implements AdminSettingService {
   public AdminSettingsDto getAdminSettings(Long degreeId) {
     return repository.findByDegreeProgramId(degreeId)
         .map(AdminSettingsDto::fromEntity)
-        .orElseThrow(() -> new ResourceNotFoundException(RESOURCE.DEGREE_PROGRAM, degreeId));
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
   }
 
   @Override
   public PeriodSettingsDto getPeriodSettings(Long degreeId) {
     return repository.findByDegreeProgramId(degreeId)
         .map(PeriodSettingsDto::fromEntity)
-        .orElseThrow(() -> new ResourceNotFoundException(RESOURCE.DEGREE_PROGRAM, degreeId));
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
   }
 
   @Override
   @Transactional
   public void updatePeriodSettings(Long degreeId, PeriodSettingsDto periodSettingsDto) {
     AdminSetting entity = repository.findByDegreeProgramId(degreeId)
-        .orElseThrow(() -> new ResourceNotFoundException(RESOURCE.DEGREE_PROGRAM, degreeId));
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
 
     if (periodSettingsDto.getWorkDate() != null) {
       entity.setWorkStartDate(periodSettingsDto.getWorkDate().getStartDate());
@@ -67,14 +67,14 @@ public class AdminSettingServiceImpl implements AdminSettingService {
   public SlotSettingsDto getSlotSettings(Long degreeId) {
     return repository.findByDegreeProgramId(degreeId)
         .map(SlotSettingsDto::fromEntity)
-        .orElseThrow(() -> new ResourceNotFoundException(RESOURCE.DEGREE_PROGRAM, degreeId));
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
   }
 
   @Override
   @Transactional
   public void updateSlotSettings(Long degreeId, SlotSettingsDto updatedSlotSettingsDto) {
     AdminSetting entity = repository.findByDegreeProgramId(degreeId)
-        .orElseThrow(() -> new ResourceNotFoundException(RESOURCE.DEGREE_PROGRAM, degreeId));
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
     if (updatedSlotSettingsDto.capacityPerSlot() != null) {
       entity.setCapacityPerSlot(updatedSlotSettingsDto.capacityPerSlot());
     }
@@ -89,14 +89,14 @@ public class AdminSettingServiceImpl implements AdminSettingService {
   public List<LocalDate> getNonWorkingDays(Long degreeId) {
     return repository.findByDegreeProgramId(degreeId)
         .map(AdminSetting::getNonWorkingDays)
-        .orElseThrow(() -> new ResourceNotFoundException(RESOURCE.DEGREE_PROGRAM, degreeId));
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
   }
 
   @Override
   @Transactional
   public void updateNonWorkingDays(Long degreeId, List<LocalDate> updatedNonWorkingDays) {
     AdminSetting entity = repository.findByDegreeProgramId(degreeId)
-        .orElseThrow(() -> new ResourceNotFoundException(RESOURCE.DEGREE_PROGRAM, degreeId));
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
     entity.setNonWorkingDays(updatedNonWorkingDays);
     repository.save(entity);
     regenerageUnbookedSlots(degreeId);
@@ -106,7 +106,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
   public List<ExcludedSlotSettingsDto> getExcludedSlots(Long degreeId) {
     List<ExcludedSlot> excludedSlots = repository.findByDegreeProgramId(degreeId)
         .map(AdminSetting::getExcludedSlots)
-        .orElseThrow(() -> new ResourceNotFoundException(RESOURCE.DEGREE_PROGRAM, degreeId));
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
     return excludedSlots.stream()
         .map(ExcludedSlotSettingsDto::fromEntity)
         .toList();
@@ -116,7 +116,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
   @Transactional
   public void createExcludedSlot(Long degreeId, ExcludedSlotSettingsDto excludedSlotSettingsDto) {
     AdminSetting entity = repository.findByDegreeProgramId(degreeId)
-        .orElseThrow(() -> new ResourceNotFoundException(RESOURCE.DEGREE_PROGRAM, degreeId));
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
     entity.getExcludedSlots()
         .add(excludedSlotSettingsDto.withId(System.currentTimeMillis()).toEntity());
     repository.save(entity);
@@ -127,10 +127,10 @@ public class AdminSettingServiceImpl implements AdminSettingService {
   @Transactional
   public void deleteExcludedSlot(Long degreeId, Long id) {
     AdminSetting settings = repository.findByDegreeProgramId(degreeId)
-        .orElseThrow(() -> new ResourceNotFoundException(RESOURCE.DEGREE_PROGRAM, degreeId));
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.DEGREE_PROGRAM, degreeId));
     boolean removed = settings.getExcludedSlots().removeIf(slot -> slot.getId().equals(id));
     if (!removed) {
-      throw new ResourceNotFoundException(RESOURCE.EXCLUDED_SLOT, id);
+      throw new ResourceNotFoundException(Resource.EXCLUDED_SLOT, id);
     }
     repository.save(settings);
     regenerageUnbookedSlots(degreeId);
@@ -138,8 +138,8 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
   private void regenerageUnbookedSlots(Long degreeId) {
     AdminSettingsDto adminSettings = getAdminSettings(degreeId);
-    slotGenerationService.generateAndSaveWithSkipBooked(adminSettings.periodSettings(),
-        adminSettings.slotSettings(), adminSettings.nonWorkingDays(),
-        adminSettings.excludedSlotSettings(), degreeId);
+    slotGenerationService.generateAndSaveWithSkipBooked(adminSettings.periods(),
+        adminSettings.slots(), adminSettings.nonWorkingDays(),
+        adminSettings.excludedSlots(), degreeId);
   }
 }

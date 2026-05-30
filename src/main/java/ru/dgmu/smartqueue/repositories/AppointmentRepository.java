@@ -26,4 +26,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
       @Param("date") LocalDate date,
       @Param("degreeProgramId") Long degreeProgramId
   );
+
+  boolean existsBySlot_DegreeProgram_IdAndPhone(Long degreeId, String phone);
 }

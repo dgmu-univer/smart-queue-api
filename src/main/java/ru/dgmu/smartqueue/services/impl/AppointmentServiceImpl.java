@@ -13,7 +13,8 @@ import ru.dgmu.smartqueue.dtos.AppointmentsRequestDto;
 import ru.dgmu.smartqueue.dtos.CalendarAppointmentsResponseDto;
 import ru.dgmu.smartqueue.entites.Appointment;
 import ru.dgmu.smartqueue.entites.Slot;
-import ru.dgmu.smartqueue.enums.RESOURCE;
+import ru.dgmu.smartqueue.enums.Resource;
+import ru.dgmu.smartqueue.exception.AlreadyHasAppointment;
 import ru.dgmu.smartqueue.exception.IncorrectVerificationCode;
 import ru.dgmu.smartqueue.exception.ResourceNotFoundException;
 import ru.dgmu.smartqueue.exception.SlotExpired;
@@ -37,8 +38,8 @@ public class AppointmentServiceImpl implements AppointmentService {
   @Override
   @Transactional
   public Long bookSlot(AppointmentsRequestDto requestDto) {
-//    validateOnExistAppointments(requestDto);
-    validateBookingDateExpiring(requestDto);
+    validateOnExistAppointments(requestDto.degreeId(), requestDto.phone());
+    validateBookingDateExpiring(requestDto.date());
     Slot slot = slotRepository.getSlotByStartTimeAtAndDegreeProgram_Id(
             LocalDateTime.of(requestDto.date(),
                 requestDto.time()).atZone(ZoneOffset.UTC).toLocalDateTime(), requestDto.degreeId())
@@ -56,17 +57,16 @@ public class AppointmentServiceImpl implements AppointmentService {
     return notVerifiedAppointment.getId();
   }
 
-//  private void validateOnExistAppointments(AppointmentsRequestDto requestDto) {
-//    boolean isAlreadyHasAppointment = appointmentRepository.existsBySlot_DegreeProgram_IdAndPhone(
-//        requestDto.degreeId(),
-//        requestDto.phone());
-//    if (isAlreadyHasAppointment) {
-//      throw new AlreadyHasAppointment();
-//    }
-//  }
+  private void validateOnExistAppointments(Long degreeId, String phone) {
+    boolean isAlreadyHasAppointment = appointmentRepository.existsBySlot_DegreeProgram_IdAndPhone(
+        degreeId, phone);
+    if (isAlreadyHasAppointment) {
+      throw new AlreadyHasAppointment();
+    }
+  }
 
-  private void validateBookingDateExpiring(AppointmentsRequestDto requestDto) {
-    if (requestDto.date().isBefore(LocalDate.now())) {
+  private void validateBookingDateExpiring(LocalDate date) {
+    if (date.isBefore(LocalDate.now())) {
       throw new SlotExpired(
           "Вы не можете записаться в слот с временем начала ранее текущего времени");
     }
@@ -94,7 +94,7 @@ public class AppointmentServiceImpl implements AppointmentService {
   @Override
   public AppointmentDto getTets(Long id) {
     return AppointmentDto.fromEntity(appointmentRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException(RESOURCE.APPOINTMENT, id)));
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.APPOINTMENT, id)));
   }
 
   @Override

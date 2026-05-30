@@ -10,28 +10,28 @@ import ru.dgmu.smartqueue.entites.DegreeProgram;
 @Schema(description = "Настройки администратора")
 public record AdminSettingsDto(
     @NotNull(message = "Наличие настроек периода обязательно")
-    PeriodSettingsDto periodSettings,
+    PeriodSettingsDto periods,
     @NotNull(message = "Наличие настроек слотов обязательно")
-    SlotSettingsDto slotSettings,
+    SlotSettingsDto slots,
     @NotNull(message = "Наличие настроек не рабочих дней обязательно")
     List<LocalDate> nonWorkingDays,
     @NotNull(message = "Наличие настроек исклченных слотов обязательно")
-    List<ExcludedSlotSettingsDto> excludedSlotSettings
+    List<ExcludedSlotSettingsDto> excludedSlots
 ) {
 
     AdminSetting toEntity(DegreeProgram degreeProgram) {
         return new AdminSetting(
             null,
-            slotSettings.durationMinutes(),
-            slotSettings.capacityPerSlot(),
-            periodSettings.getWorkDate().getStartDate(),
-            periodSettings.getWorkDate().getEndDate(),
-            periodSettings.getWorkTime().getStartTime(),
-            periodSettings.getWorkTime().getEndTime(),
-            periodSettings.getLunch().getStartTime(),
-            periodSettings.getLunch().getEndTime(),
+            slots.durationMinutes(),
+            slots.capacityPerSlot(),
+            periods.getWorkDate().getStartDate(),
+            periods.getWorkDate().getEndDate(),
+            periods.getWorkTime().getStartTime(),
+            periods.getWorkTime().getEndTime(),
+            periods.getLunch().getStartTime(),
+            periods.getLunch().getEndTime(),
             nonWorkingDays,
-            excludedSlotSettings.stream().map(ExcludedSlotSettingsDto::toEntity).toList(),
+            excludedSlots.stream().map(ExcludedSlotSettingsDto::toEntity).toList(),
             degreeProgram
         );
     }

@@ -3,7 +3,7 @@ package ru.dgmu.smartqueue.enums;
 import lombok.Getter;
 
 @Getter
-public enum RESOURCE {
+public enum Resource {
   ADMIN_SETTINGS("Админские настройки"),
   DEGREE_PROGRAM("Программа образования"),
   SLOT("Слот"),
@@ -12,7 +12,7 @@ public enum RESOURCE {
 
   private final String displayName;
 
-  RESOURCE(String name) {
+  Resource(String name) {
     displayName = name;
   }
 }
