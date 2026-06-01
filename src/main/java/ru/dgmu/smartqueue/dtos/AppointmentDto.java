@@ -9,7 +9,8 @@ public record AppointmentDto(
     String phone,
     Boolean isVerified,
     LocalDateTime requestedAt,
-    SlotDto slot
+    SlotDto slot,
+    ShortInfoDegreeDto degree
 ) {
 
   public static AppointmentDto fromEntity(Appointment entity) {
@@ -19,7 +20,8 @@ public record AppointmentDto(
         entity.getPhone(),
         entity.getIsVerified(),
         entity.getRequestedAt(),
-        SlotDto.fromEntity(entity.getSlot())
+        SlotDto.fromEntity(entity.getSlot()),
+        ShortInfoDegreeDto.fromEntity(entity.getSlot().getDegreeProgram())
     );
   }
 
