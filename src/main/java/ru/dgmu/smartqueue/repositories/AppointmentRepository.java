@@ -22,8 +22,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
   @Query("SELECT COUNT(a) FROM Appointment a " +
       "JOIN a.slot s " +
-      "WHERE (CAST(:date AS localdate) IS NULL OR CAST(s.startTimeAt AS localdate) = :date) " +
-      "AND s.degreeProgram.id = :degreeProgramId")
+      "WHERE a.isVerified = true AND (CAST(:date AS localdate) IS NULL OR CAST(s.startTimeAt AS localdate) = :date) " +
+      "AND :degreeProgramId IS NULL OR s.degreeProgram.id = :degreeProgramId")
   long countByDateAndDegreeProgramId(
       @Param("date") LocalDate date,
       @Param("degreeProgramId") Long degreeProgramId

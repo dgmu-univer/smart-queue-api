@@ -3,7 +3,6 @@ package ru.dgmu.smartqueue.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +31,6 @@ public class StatisticController {
 
   public record StatisticRequestParams(
       @RequestParam
-      @NotNull(message = "Не передан идентификатор программы образования")
       Long degreeId,
       @RequestParam(required = false)
       LocalDate date
