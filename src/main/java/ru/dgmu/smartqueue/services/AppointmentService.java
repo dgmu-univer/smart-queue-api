@@ -1,7 +1,6 @@
 package ru.dgmu.smartqueue.services;
 
 import java.time.LocalDate;
-import java.util.List;
 import ru.dgmu.smartqueue.dtos.AppointmentDto;
 import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
 import ru.dgmu.smartqueue.dtos.AppointmentsExistingValidationRequestDto;
@@ -16,7 +15,7 @@ public interface AppointmentService {
 
   AppointmentDto getTets(Long id);
 
-  List<CalendarAppointmentsResponseDto> getAllByFilter(LocalDate from, LocalDate to,
+  CalendarAppointmentsResponseDto getAllByFilter(LocalDate from, LocalDate to,
       Long degreeId);
 
   long countByDegreeAndDate(Long degreeId, LocalDate date);

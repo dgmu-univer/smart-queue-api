@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -63,7 +62,7 @@ public class AppointmentsController {
 
   @GetMapping("/appointments")
   @Operation(summary = "Получение записей для календаря", description = "Возвращаем записи по фильтру для календаря")
-  public ResponseEntity<List<CalendarAppointmentsResponseDto>> getAllByFilter(
+  public ResponseEntity<CalendarAppointmentsResponseDto> getAllByFilter(
       @Parameter(name = "Начало интервала") @RequestParam LocalDate from,
       @Parameter(name = "Конец интервала") @RequestParam LocalDate to,
       @Parameter(name = "Программа образования") @RequestParam Long degreeId) {

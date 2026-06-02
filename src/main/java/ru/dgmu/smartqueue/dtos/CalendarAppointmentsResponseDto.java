@@ -1,12 +1,12 @@
 package ru.dgmu.smartqueue.dtos;
 
-import java.time.LocalDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 
+@Schema(description = "Ответ с массивом записей")
 public record CalendarAppointmentsResponseDto(
-    Long id,
-    String title,
-    LocalDateTime start,
-    LocalDateTime end
+    SlotSettingsDto slotSettings,
+    List<SlotsWithPinsDto> slots
 ) {
 
 }

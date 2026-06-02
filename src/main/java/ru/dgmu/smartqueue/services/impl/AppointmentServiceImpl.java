@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +17,8 @@ import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
 import ru.dgmu.smartqueue.dtos.AppointmentsExistingValidationRequestDto;
 import ru.dgmu.smartqueue.dtos.AppointmentsRequestDto;
 import ru.dgmu.smartqueue.dtos.CalendarAppointmentsResponseDto;
+import ru.dgmu.smartqueue.dtos.SlotSettingsDto;
+import ru.dgmu.smartqueue.dtos.SlotsWithPinsDto;
 import ru.dgmu.smartqueue.entites.Appointment;
 import ru.dgmu.smartqueue.entites.Slot;
 import ru.dgmu.smartqueue.enums.Resource;
@@ -98,12 +102,14 @@ public class AppointmentServiceImpl implements AppointmentService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<CalendarAppointmentsResponseDto> getAllByFilter(LocalDate from, LocalDate to,
+  public CalendarAppointmentsResponseDto getAllByFilter(LocalDate from, LocalDate to,
       Long degreeId) {
     List<Appointment> allByInterval = appointmentRepository.findAllByInterval(from, to, degreeId);
-    return allByInterval.stream()
-        .map(this::buildCalendarResponseDto)
+    List<SlotsWithPinsDto> slotsWithPins = allByInterval.stream()
+        .collect(Collectors.groupingBy(Appointment::getSlot)).entrySet().stream()
+        .map(SlotsWithPinsDto::build)
         .toList();
+    return new CalendarAppointmentsResponseDto(adminSettingService.getSlotSettings(degreeId), slotsWithPins);
   }
 
   @Override
@@ -115,15 +121,6 @@ public class AppointmentServiceImpl implements AppointmentService {
   public boolean checkExisting(AppointmentsExistingValidationRequestDto requestDto) {
     return appointmentRepository.existsBySlot_DegreeProgram_IdAndPhone(requestDto.degreeId(),
         requestDto.phone());
-  }
-
-  CalendarAppointmentsResponseDto buildCalendarResponseDto(Appointment appointment) {
-    return new CalendarAppointmentsResponseDto(
-        appointment.getId(),
-        appointment.getPin(),
-        appointment.getSlot().getStartTimeAt(),
-        appointment.getSlot().getEndTimeAt()
-    );
   }
 
   @Scheduled(cron = "0 * * * * *")

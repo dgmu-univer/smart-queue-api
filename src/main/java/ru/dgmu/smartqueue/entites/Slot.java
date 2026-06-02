@@ -14,6 +14,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,4 +47,18 @@ public class Slot {
   @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)
   @JsonIgnore
   List<Appointment> appointments;
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Slot slot = (Slot) o;
+    return Objects.equals(id, slot.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(id);
+  }
 }
