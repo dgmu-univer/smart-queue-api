@@ -1,4 +1,4 @@
-package ru.dgmu.smartqueue.exception;
+package ru.dgmu.smartqueue.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;

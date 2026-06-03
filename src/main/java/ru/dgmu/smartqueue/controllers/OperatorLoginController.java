@@ -21,7 +21,7 @@ import ru.dgmu.smartqueue.configs.PinAuthenticationToken;
 import ru.dgmu.smartqueue.dtos.OperatorLoginSuccessDto;
 import ru.dgmu.smartqueue.dtos.SignInOperatorDto;
 import ru.dgmu.smartqueue.entites.User;
-import ru.dgmu.smartqueue.exception.AuthenticationFailedException;
+import ru.dgmu.smartqueue.exceptions.AuthenticationFailedException;
 import ru.dgmu.smartqueue.services.OperatorLoginService;
 
 @RestController

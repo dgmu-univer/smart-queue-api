@@ -13,7 +13,7 @@ import ru.dgmu.smartqueue.dtos.DegreeProgramsWithPeriodDto;
 import ru.dgmu.smartqueue.entites.DegreeProgram;
 import ru.dgmu.smartqueue.entites.User;
 import ru.dgmu.smartqueue.enums.Role;
-import ru.dgmu.smartqueue.exception.DuplicateUserPinException;
+import ru.dgmu.smartqueue.exceptions.DuplicateUserPinException;
 import ru.dgmu.smartqueue.repositories.DegreeProgramRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
 import ru.dgmu.smartqueue.services.DegreeProgramService;

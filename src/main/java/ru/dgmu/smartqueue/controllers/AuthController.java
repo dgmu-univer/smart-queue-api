@@ -23,7 +23,7 @@ import ru.dgmu.smartqueue.dtos.SignInRequestDto;
 import ru.dgmu.smartqueue.dtos.UserDto;
 import ru.dgmu.smartqueue.dtos.UserDto.UserContextPresentationDto;
 import ru.dgmu.smartqueue.entites.User;
-import ru.dgmu.smartqueue.exception.AuthenticationFailedException;
+import ru.dgmu.smartqueue.exceptions.AuthenticationFailedException;
 
 @RestController
 @Tag(name = "Admin login", description = "Аутентификация администратора")

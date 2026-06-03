@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.dgmu.smartqueue.entites.User;
-import ru.dgmu.smartqueue.exception.AuthenticationFailedException;
+import ru.dgmu.smartqueue.exceptions.AuthenticationFailedException;
 import ru.dgmu.smartqueue.repositories.UserRepository;
 import ru.dgmu.smartqueue.services.UserService;
 

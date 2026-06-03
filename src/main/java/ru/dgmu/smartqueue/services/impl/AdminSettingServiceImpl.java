@@ -13,7 +13,7 @@ import ru.dgmu.smartqueue.dtos.SlotSettingsDto;
 import ru.dgmu.smartqueue.entites.AdminSetting;
 import ru.dgmu.smartqueue.entites.ExcludedSlot;
 import ru.dgmu.smartqueue.enums.Resource;
-import ru.dgmu.smartqueue.exception.ResourceNotFoundException;
+import ru.dgmu.smartqueue.exceptions.ResourceNotFoundException;
 import ru.dgmu.smartqueue.repositories.AdminSettingsRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
 import ru.dgmu.smartqueue.services.SlotGenerationService;

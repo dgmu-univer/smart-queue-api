@@ -1,4 +1,4 @@
-package ru.dgmu.smartqueue.exception;
+package ru.dgmu.smartqueue.exceptions;
 
 public class DuplicateUserPinException extends BusinessException {
 

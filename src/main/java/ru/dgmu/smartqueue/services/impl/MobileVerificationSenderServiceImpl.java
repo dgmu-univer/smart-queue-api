@@ -5,7 +5,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.dgmu.smartqueue.clients.MtsExolveClient;
-import ru.dgmu.smartqueue.exception.SmsSendingException;
+import ru.dgmu.smartqueue.exceptions.SmsSendingException;
 import ru.dgmu.smartqueue.services.MobileVerificationSenderService;
 
 @Service
@@ -27,6 +27,4 @@ public class MobileVerificationSenderServiceImpl implements MobileVerificationSe
       throw new SmsSendingException(e);
     }
   }
-
-  // todo код подверждения нужен для подтверждения записи. А pin как отдавать?
 }
