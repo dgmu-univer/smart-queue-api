@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,6 @@ import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
 import ru.dgmu.smartqueue.dtos.AppointmentsExistingValidationRequestDto;
 import ru.dgmu.smartqueue.dtos.AppointmentsRequestDto;
 import ru.dgmu.smartqueue.dtos.CalendarAppointmentsResponseDto;
-import ru.dgmu.smartqueue.dtos.SlotSettingsDto;
 import ru.dgmu.smartqueue.dtos.SlotsWithPinsDto;
 import ru.dgmu.smartqueue.entites.Appointment;
 import ru.dgmu.smartqueue.entites.Slot;
@@ -108,6 +106,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     List<SlotsWithPinsDto> slotsWithPins = allByInterval.stream()
         .collect(Collectors.groupingBy(Appointment::getSlot)).entrySet().stream()
         .map(SlotsWithPinsDto::build)
+        .sorted()
         .toList();
     return new CalendarAppointmentsResponseDto(adminSettingService.getSlotSettings(degreeId), slotsWithPins);
   }

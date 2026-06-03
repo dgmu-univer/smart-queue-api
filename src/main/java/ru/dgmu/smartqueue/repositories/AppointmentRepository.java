@@ -15,8 +15,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
   @Query("""
         SELECT a FROM Appointment a
-        WHERE a.isVerified = true AND CAST(a.slot.startTimeAt AS localdate) between :from AND :to
-          AND a.slot.degreeProgram.id = :degreeId
+              JOIN FETCH a.slot s
+              JOIN FETCH s.degreeProgram dp
+        WHERE a.isVerified = true AND CAST(s.startTimeAt AS localdate) between :from AND :to
+          AND dp.id = :degreeId
       """)
   List<Appointment> findAllByInterval(LocalDate from, LocalDate to, Long degreeId);
 

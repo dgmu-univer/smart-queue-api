@@ -15,7 +15,7 @@ public record SlotsWithPinsDto(
     LocalDateTime end,
     @Schema(description = "Пин коды по слоту")
     List<String> pins
-) {
+) implements Comparable<SlotsWithPinsDto> {
 
   public static SlotsWithPinsDto build(Map.Entry<Slot, List<Appointment>> slotWithAppointment) {
     return new SlotsWithPinsDto(
@@ -23,5 +23,13 @@ public record SlotsWithPinsDto(
         slotWithAppointment.getKey().getEndTimeAt(),
         slotWithAppointment.getValue().stream().map(Appointment::getPin).toList()
     );
+  }
+
+  @Override
+  public int compareTo(SlotsWithPinsDto o) {
+    if (o == null) {
+      throw new NullPointerException("Cannot compare to a null SlotsWithPinsDto");
+    }
+    return this.start.compareTo(o.start);
   }
 }
