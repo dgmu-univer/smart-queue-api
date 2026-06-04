@@ -37,7 +37,7 @@ import ru.dgmu.smartqueue.services.AdminSettingService;
 @RequiredArgsConstructor
 @Tag(name = "Admin Settings", description = "Управление настройками администратора")
 @SecurityRequirement(name = "bearerAuth")
-public class DegreeProgramAdminSettings {
+public class DegreeProgramAdminSettingsController {
 
   private final AdminSettingService adminSettingService;
 

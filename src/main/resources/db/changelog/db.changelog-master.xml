@@ -12,4 +12,5 @@
   <include file="changelog/005.create_appointment_table.xml" relativeToChangelogFile="true"/>
   <include file="changelog/006.add_verified_to_appointment.xml" relativeToChangelogFile="true"/>
   <include file="changelog/007.modify_appointments_table.xml" relativeToChangelogFile="true"/>
+  <include file="changelog/008.add_cascade_delete_to_appointment_slot_fk.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

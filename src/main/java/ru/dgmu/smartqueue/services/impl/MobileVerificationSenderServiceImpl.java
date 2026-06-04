@@ -19,12 +19,13 @@ public class MobileVerificationSenderServiceImpl implements MobileVerificationSe
 
   @Override
   public void sendVerificationCode(String phone, String verificationCode) {
-    try {
-      var parsedPhone = phoneUtil.parse(phone, "RU");
-      String phoneWithCountryCode = parsedPhone.getCountryCode() + "" + parsedPhone.getNationalNumber();
-      smsClient.sendSms(SMS_TEMPLATE.formatted(verificationCode), phoneWithCountryCode);
-    } catch (NumberParseException e) {
-      throw new SmsSendingException(e);
-    }
+    // fixme uncomment
+//    try {
+//      var parsedPhone = phoneUtil.parse(phone, "RU");
+//      String phoneWithCountryCode = parsedPhone.getCountryCode() + "" + parsedPhone.getNationalNumber();
+//      smsClient.sendSms(SMS_TEMPLATE.formatted(verificationCode), phoneWithCountryCode);
+//    } catch (NumberParseException e) {
+//      throw new SmsSendingException(e);
+//    }
   }
 }
