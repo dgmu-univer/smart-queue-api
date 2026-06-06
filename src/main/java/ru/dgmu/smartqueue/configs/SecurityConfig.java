@@ -43,7 +43,7 @@ public class SecurityConfig {
         .cors(cors -> cors.configurationSource(request -> {
           var corsConfiguration = new CorsConfiguration();
           corsConfiguration.setAllowedOriginPatterns(
-              List.of("https://price05.ru", "http://localhost:3000")); // todo вынести в переменную
+              List.of("https://xn--d1aba8al4b0b.xn--c1abz2a.xn--p1ai","https://очередь.дгму.рф", "http://localhost:3000")); // todo вынести в переменную
           corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
           corsConfiguration.setAllowedHeaders(List.of("*"));
           return corsConfiguration;
