@@ -22,10 +22,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
       """)
   List<Appointment> findAllByInterval(LocalDate from, LocalDate to, Long degreeId);
 
-  @Query("SELECT COUNT(a) FROM Appointment a " +
-      "JOIN a.slot s " +
-      "WHERE a.isVerified = true AND (CAST(:date AS localdate) IS NULL OR CAST(s.startTimeAt AS localdate) = :date) " +
-      "AND :degreeProgramId IS NULL OR s.degreeProgram.id = :degreeProgramId")
+  @Query("""
+      SELECT COUNT(a) FROM Appointment a
+      JOIN a.slot s
+      WHERE a.isVerified = true AND (CAST(:date AS localdate) IS NULL OR CAST(s.startTimeAt AS localdate) = :date)
+      AND (:degreeProgramId IS NULL OR s.degreeProgram.id = :degreeProgramId)
+      """)
   long countByDateAndDegreeProgramId(
       @Param("date") LocalDate date,
       @Param("degreeProgramId") Long degreeProgramId

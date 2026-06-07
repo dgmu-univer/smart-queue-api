@@ -83,7 +83,8 @@ public class AppointmentServiceImpl implements AppointmentService {
   @Override
   @Transactional
   public AppointmentDto verifyAppointment(AppointmentVerificationRequest verificationRequest) {
-    Appointment appointment = appointmentRepository.getReferenceById(verificationRequest.id());
+    Appointment appointment = appointmentRepository.findById(verificationRequest.id())
+        .orElseThrow(() -> new ResourceNotFoundException(Resource.APPOINTMENT, verificationRequest.id()));
     if (appointment.getPin().equals(verificationRequest.verificationCode())) {
       appointment.setIsVerified(Boolean.TRUE);
     } else {
