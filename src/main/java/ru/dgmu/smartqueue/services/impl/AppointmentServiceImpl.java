@@ -95,7 +95,7 @@ public class AppointmentServiceImpl implements AppointmentService {
       throw new IncorrectVerificationCode("Неверный код верификации");
     }
     try {
-      return AppointmentDto.fromEntity(appointmentRepository.save(appointment));
+      return AppointmentDto.fromEntity(appointmentRepository.saveAndFlush(appointment));
     } catch (DataIntegrityViolationException e) {
       log.error("Error while saving appointment", e);
       throw new VerifiedAppointmentByNumberAlreadyExists();
