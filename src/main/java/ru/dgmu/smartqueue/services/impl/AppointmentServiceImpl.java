@@ -93,7 +93,7 @@ public class AppointmentServiceImpl implements AppointmentService {
       throw new IncorrectVerificationCode("Неверный код верификации");
     }
     appointmentRepository.deleteById(verificationRequest.id());
-    return AppointmentDto.fromEntity(appointmentRepository.saveAndFlush(appointment));
+    return AppointmentDto.fromEntity(appointmentRepository.save(appointment));
   }
 
   @Override
