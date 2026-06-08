@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +24,6 @@ import ru.dgmu.smartqueue.exceptions.IncorrectVerificationCode;
 import ru.dgmu.smartqueue.exceptions.ResourceNotFoundException;
 import ru.dgmu.smartqueue.exceptions.SlotExpired;
 import ru.dgmu.smartqueue.exceptions.SlotOverflowed;
-import ru.dgmu.smartqueue.exceptions.VerifiedAppointmentByNumberAlreadyExists;
 import ru.dgmu.smartqueue.repositories.AppointmentRepository;
 import ru.dgmu.smartqueue.repositories.SlotRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
@@ -94,12 +92,8 @@ public class AppointmentServiceImpl implements AppointmentService {
       log.error("Incorrect verification code");
       throw new IncorrectVerificationCode("Неверный код верификации");
     }
-    try {
-      return AppointmentDto.fromEntity(appointmentRepository.saveAndFlush(appointment));
-    } catch (DataIntegrityViolationException e) {
-      log.error("Error while saving appointment", e);
-      throw new VerifiedAppointmentByNumberAlreadyExists();
-    }
+    appointmentRepository.delete(appointment);
+    return AppointmentDto.fromEntity(appointmentRepository.saveAndFlush(appointment));
   }
 
   @Override
