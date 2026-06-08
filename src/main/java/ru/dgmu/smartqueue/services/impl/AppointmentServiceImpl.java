@@ -24,6 +24,7 @@ import ru.dgmu.smartqueue.exceptions.IncorrectVerificationCode;
 import ru.dgmu.smartqueue.exceptions.ResourceNotFoundException;
 import ru.dgmu.smartqueue.exceptions.SlotExpired;
 import ru.dgmu.smartqueue.exceptions.SlotOverflowed;
+import ru.dgmu.smartqueue.exceptions.VerifiedAppointmentByNumberAlreadyExists;
 import ru.dgmu.smartqueue.repositories.AppointmentRepository;
 import ru.dgmu.smartqueue.repositories.SlotRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
@@ -55,7 +56,8 @@ public class AppointmentServiceImpl implements AppointmentService {
             "Ресурс: 'Слот' для уровня образования с идентификатором: %s и на время %s не найден".formatted(
                 requestDto.degreeId(), requestDto.date())));
     VerificationCode verificationCode = OneTimeTokenGenerator.generateCode();
-    appointmentRepository.deleteByDegreeIdAndPhone(requestDto.degreeId(), requestDto.phone());
+    appointmentRepository.deleteByDegreeIdAndPhone(requestDto.degreeId(),
+        requestDto.phone());
     Appointment appointment = buildEntity(requestDto, verificationCode, slot);
     Appointment notVerifiedAppointment = appointmentRepository.save(appointment);
     if (isSlotAlreadyOverflowed(appointment)) {
@@ -92,15 +94,15 @@ public class AppointmentServiceImpl implements AppointmentService {
       throw new IncorrectVerificationCode("Неверный код верификации");
     }
 
-    appointmentRepository.findByPhoneAndIsVerifiedTrueAndSlot_DegreeProgram_Id(
-            appointment.getPhone(), appointment.getSlot().getDegreeProgram().getId())
-        .ifPresent(existing -> {
-          appointmentRepository.delete(existing);
-          appointmentRepository.flush();
-        });
+    boolean isAlreadyExistVerified = appointmentRepository.existsBySlot_DegreeProgram_IdAndPhoneAndIsVerifiedTrue(
+        appointment.getSlot().getDegreeProgram().getId(), appointment.getPhone());
+
+    if (isAlreadyExistVerified) {
+      throw new VerifiedAppointmentByNumberAlreadyExists();
+    }
 
     appointment.setIsVerified(Boolean.TRUE);
-    return AppointmentDto.fromEntity(appointmentRepository.saveAndFlush(appointment));
+    return AppointmentDto.fromEntity(appointmentRepository.save(appointment));
   }
 
   @Override
