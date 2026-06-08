@@ -37,7 +37,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
   @Modifying
   @Query("DELETE FROM Appointment a WHERE a.slot.degreeProgram.id = :degreeId AND a.phone = :phone")
-  int deleteByDegreeIdAndPhone(@Param("degreeId") Long degreeId, @Param("phone") String phone);
+  void deleteByDegreeIdAndPhone(@Param("degreeId") Long degreeId, @Param("phone") String phone);
 
   @Modifying
   @Query("DELETE FROM Appointment a WHERE a.isVerified = false AND a.requestedAt < :expireTime")
