@@ -86,14 +86,21 @@ public class AppointmentServiceImpl implements AppointmentService {
     Appointment appointment = appointmentRepository.findById(verificationRequest.id())
         .orElseThrow(
             () -> new ResourceNotFoundException(Resource.APPOINTMENT, verificationRequest.id()));
-    if (appointment.getPin().equals(verificationRequest.verificationCode())) {
-      appointment.setIsVerified(Boolean.TRUE);
-    } else {
+
+    if (!appointment.getPin().equals(verificationRequest.verificationCode())) {
       log.error("Incorrect verification code");
       throw new IncorrectVerificationCode("Неверный код верификации");
     }
-    appointmentRepository.deleteById(verificationRequest.id());
-    return AppointmentDto.fromEntity(appointmentRepository.save(appointment));
+
+    appointmentRepository.findByPhoneAndIsVerifiedTrueAndSlot_DegreeProgram_Id(
+            appointment.getPhone(), appointment.getSlot().getDegreeProgram().getId())
+        .ifPresent(existing -> {
+          appointmentRepository.delete(existing);
+          appointmentRepository.flush();
+        });
+
+    appointment.setIsVerified(Boolean.TRUE);
+    return AppointmentDto.fromEntity(appointmentRepository.saveAndFlush(appointment));
   }
 
   @Override
@@ -123,7 +130,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
   @Override
   public boolean checkExisting(AppointmentsExistingValidationRequestDto requestDto) {
-    return appointmentRepository.existsBySlot_DegreeProgram_IdAndPhone(requestDto.degreeId(),
+    return appointmentRepository.existsBySlot_DegreeProgram_IdAndPhoneAndIsVerifiedTrue(
+        requestDto.degreeId(),
         requestDto.phone());
   }
 

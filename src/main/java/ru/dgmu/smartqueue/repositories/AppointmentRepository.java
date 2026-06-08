@@ -3,6 +3,7 @@ package ru.dgmu.smartqueue.repositories;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -33,7 +34,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
       @Param("degreeProgramId") Long degreeProgramId
   );
 
-  boolean existsBySlot_DegreeProgram_IdAndPhone(Long degreeId, String phone);
+  boolean existsBySlot_DegreeProgram_IdAndPhoneAndIsVerifiedTrue(Long degreeId, String phone);
 
   @Modifying
   @Query("DELETE FROM Appointment a WHERE a.slot.degreeProgram.id = :degreeId AND a.phone = :phone")
@@ -42,4 +43,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
   @Modifying
   @Query("DELETE FROM Appointment a WHERE a.isVerified = false AND a.requestedAt < :expireTime")
   int deleteExpiredUnverifiedAppointments(@Param("expireTime") LocalDateTime expireTime);
+
+  Optional<Appointment> findByPhoneAndIsVerifiedTrueAndSlot_DegreeProgram_Id(String phone, Long degreeId);
 }
