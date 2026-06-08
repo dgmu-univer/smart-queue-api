@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ import ru.dgmu.smartqueue.exceptions.IncorrectVerificationCode;
 import ru.dgmu.smartqueue.exceptions.ResourceNotFoundException;
 import ru.dgmu.smartqueue.exceptions.SlotExpired;
 import ru.dgmu.smartqueue.exceptions.SlotOverflowed;
+import ru.dgmu.smartqueue.exceptions.VerifiedAppointmentByNumberAlreadyExists;
 import ru.dgmu.smartqueue.repositories.AppointmentRepository;
 import ru.dgmu.smartqueue.repositories.SlotRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
@@ -84,13 +86,20 @@ public class AppointmentServiceImpl implements AppointmentService {
   @Transactional
   public AppointmentDto verifyAppointment(AppointmentVerificationRequest verificationRequest) {
     Appointment appointment = appointmentRepository.findById(verificationRequest.id())
-        .orElseThrow(() -> new ResourceNotFoundException(Resource.APPOINTMENT, verificationRequest.id()));
+        .orElseThrow(
+            () -> new ResourceNotFoundException(Resource.APPOINTMENT, verificationRequest.id()));
     if (appointment.getPin().equals(verificationRequest.verificationCode())) {
       appointment.setIsVerified(Boolean.TRUE);
     } else {
+      log.error("Incorrect verification code");
       throw new IncorrectVerificationCode("Неверный код верификации");
     }
-    return AppointmentDto.fromEntity(appointmentRepository.save(appointment));
+    try {
+      return AppointmentDto.fromEntity(appointmentRepository.save(appointment));
+    } catch (DataIntegrityViolationException e) {
+      log.error("Error while saving appointment", e);
+      throw new VerifiedAppointmentByNumberAlreadyExists();
+    }
   }
 
   @Override
@@ -109,7 +118,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         .map(SlotsWithPinsDto::build)
         .sorted()
         .toList();
-    return new CalendarAppointmentsResponseDto(adminSettingService.getSlotSettings(degreeId), slotsWithPins);
+    return new CalendarAppointmentsResponseDto(adminSettingService.getSlotSettings(degreeId),
+        slotsWithPins);
   }
 
   @Override
