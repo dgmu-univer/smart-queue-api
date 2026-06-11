@@ -24,13 +24,13 @@ public class MtsExolveClient {
   }
 
   public void sendSms(String message, String destinationNumber) {
-    restClient.post()
-        .uri(url)
-        .contentType(MediaType.APPLICATION_JSON)
-        .header("Authorization", "Bearer %s".formatted(apiKey))
-        .body(new RequestBody(senderNumber, destinationNumber, message))
-        .retrieve()
-        .toBodilessEntity();
+//    restClient.post()
+//        .uri(url)
+//        .contentType(MediaType.APPLICATION_JSON)
+//        .header("Authorization", "Bearer %s".formatted(apiKey))
+//        .body(new RequestBody(senderNumber, destinationNumber, message))
+//        .retrieve()
+//        .toBodilessEntity();
   }
 
   record RequestBody(
