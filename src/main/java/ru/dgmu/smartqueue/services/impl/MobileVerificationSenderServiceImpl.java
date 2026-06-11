@@ -12,20 +12,19 @@ import ru.dgmu.smartqueue.services.MobileVerificationSenderService;
 @RequiredArgsConstructor
 public class MobileVerificationSenderServiceImpl implements MobileVerificationSenderService {
 
-  private static final String SMS_TEMPLATE = "Ваш код подтверждения: %s";
+  private static final String SMS_TEMPLATE = "PIN: %s для онлайн-записи в приёмную комиссию ДГМУ";
   private static final PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
 
   private final MtsExolveClient smsClient;
 
   @Override
   public void sendVerificationCode(String phone, String verificationCode) {
-    // fixme uncomment
-//    try {
-//      var parsedPhone = phoneUtil.parse(phone, "RU");
-//      String phoneWithCountryCode = parsedPhone.getCountryCode() + "" + parsedPhone.getNationalNumber();
-//      smsClient.sendSms(SMS_TEMPLATE.formatted(verificationCode), phoneWithCountryCode);
-//    } catch (NumberParseException e) {
-//      throw new SmsSendingException(e);
-//    }
+    try {
+      var parsedPhone = phoneUtil.parse(phone, "RU");
+      var phoneWithCountryCode = parsedPhone.getCountryCode() + "" + parsedPhone.getNationalNumber();
+      smsClient.sendSms(SMS_TEMPLATE.formatted(verificationCode), phoneWithCountryCode);
+    } catch (NumberParseException e) {
+      throw new SmsSendingException(e);
+    }
   }
 }
