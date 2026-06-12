@@ -1,12 +1,15 @@
 package ru.dgmu.smartqueue.controllers;
 
+import io.github.bucket4j.ConsumptionProbe;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.dgmu.smartqueue.component.AppointmentBookRateLimiterComponent;
 import ru.dgmu.smartqueue.dtos.AppointmentDto;
 import ru.dgmu.smartqueue.dtos.AppointmentExistingValidationResponseDto;
 import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
@@ -31,11 +35,33 @@ import ru.dgmu.smartqueue.services.AppointmentService;
 public class AppointmentsController {
 
   private final AppointmentService appointmentService;
+  private final AppointmentBookRateLimiterComponent appointmentBookRateLimiterComponent;
 
   @PostMapping("/public/appointments")
   @Operation(summary = "Запись в слот", description = "Создает новую неверефицированную запись")
-  public ResponseEntity<Long> bookSlot(@RequestBody @Valid AppointmentsRequestDto requestDto) {
-    return ResponseEntity.ok(appointmentService.bookSlot(requestDto));
+  public ResponseEntity<Long> bookSlot(@RequestBody @Valid AppointmentsRequestDto requestDto,
+      HttpServletRequest request) {
+    var ipAddress = request.getRemoteAddr();
+
+    ConsumptionProbe probe;
+    try {
+      probe = appointmentBookRateLimiterComponent.resolveBucket(ipAddress)
+          .tryConsumeAndReturnRemaining(1);
+    } catch (Exception e) {
+      probe = ConsumptionProbe.consumed(0, 0);
+      log.error("Redis Rate Limiter недоступен для ключа {}. Сработал Fail-Open.", ipAddress, e);
+    }
+    if (probe.isConsumed()) {
+      return ResponseEntity.status(HttpStatus.OK)
+          .header("X-Ratelimit-Remaining", String.valueOf(probe.getRemainingTokens()))
+          .body(appointmentService.bookSlot(requestDto));
+    }
+    long nanosToWait = probe.getNanosToWaitForRefill();
+    long secondsToWait = java.util.concurrent.TimeUnit.NANOSECONDS.toSeconds(nanosToWait);
+    return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+        .header("X-Ratelimit-Retry-After", String.valueOf(secondsToWait))
+        .header("X-Ratelimit-Remaining", String.valueOf(probe.getRemainingTokens()))
+        .build();
   }
 
   @PostMapping("/public/appointments/existing-validation")
