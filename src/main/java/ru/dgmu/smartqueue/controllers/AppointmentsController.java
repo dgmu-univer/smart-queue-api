@@ -60,6 +60,7 @@ public class AppointmentsController {
     }
     log.warn("Temporally blocked appointment for ip: {}", ipAddress);
     return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+        .header("Access-Control-Expose-Headers", "X-Ratelimit-Retry-After")
         .header("X-Ratelimit-Retry-After", String.valueOf(TimeUnit.NANOSECONDS.toSeconds(probe.getNanosToWaitForRefill())))
         .header("X-Ratelimit-Remaining", String.valueOf(probe.getRemainingTokens()))
         .build();
