@@ -35,7 +35,10 @@ import ru.dgmu.smartqueue.services.AppointmentService;
 @Tag(name = "Appointments", description = "Управление записями")
 public class AppointmentsController {
 
-  private static final String X_FORWARDED_FOR = "X-Forwarded-For";
+  private static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";
+  private static final String X_RATE_LIMIT_RETRY_AFTER_HEADER = "X-Ratelimit-Retry-After";
+  private static final String X_RATE_LIMIT_REMAINING_HEADER = "X-Ratelimit-Remaining";
+  private static final String AC_EXPOSE_HEADERS_HEADER = "Access-Control-Expose-Headers";
 
   private final AppointmentService appointmentService;
   private final AppointmentBookRateLimiterComponent appointmentBookRateLimiterComponent;
@@ -44,7 +47,7 @@ public class AppointmentsController {
   @Operation(summary = "Запись в слот", description = "Создает новую неверефицированную запись")
   public ResponseEntity<Long> bookSlot(@RequestBody @Valid AppointmentsRequestDto requestDto,
       HttpServletRequest request) {
-    String ipAddress = request.getHeader(X_FORWARDED_FOR);
+    String ipAddress = request.getHeader(X_FORWARDED_FOR_HEADER);
     ConsumptionProbe probe;
     try {
       probe = appointmentBookRateLimiterComponent.resolveBucket(ipAddress)
@@ -55,14 +58,15 @@ public class AppointmentsController {
     }
     if (probe.isConsumed()) {
       return ResponseEntity.status(HttpStatus.OK)
-          .header("X-Ratelimit-Remaining", String.valueOf(probe.getRemainingTokens()))
+          .header(AC_EXPOSE_HEADERS_HEADER, "%s, %s".formatted(X_RATE_LIMIT_RETRY_AFTER_HEADER, X_RATE_LIMIT_REMAINING_HEADER))
+          .header(X_RATE_LIMIT_REMAINING_HEADER, String.valueOf(probe.getRemainingTokens()))
           .body(appointmentService.bookSlot(requestDto));
     }
     log.warn("Temporally blocked appointment for ip: {}", ipAddress);
     return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-        .header("Access-Control-Expose-Headers", "X-Ratelimit-Retry-After")
-        .header("X-Ratelimit-Retry-After", String.valueOf(TimeUnit.NANOSECONDS.toSeconds(probe.getNanosToWaitForRefill())))
-        .header("X-Ratelimit-Remaining", String.valueOf(probe.getRemainingTokens()))
+        .header(AC_EXPOSE_HEADERS_HEADER, "%s, %s".formatted(X_RATE_LIMIT_RETRY_AFTER_HEADER, X_RATE_LIMIT_REMAINING_HEADER))
+        .header(X_RATE_LIMIT_RETRY_AFTER_HEADER, String.valueOf(TimeUnit.NANOSECONDS.toSeconds(probe.getNanosToWaitForRefill())))
+        .header(X_RATE_LIMIT_REMAINING_HEADER, String.valueOf(probe.getRemainingTokens()))
         .build();
   }
 
