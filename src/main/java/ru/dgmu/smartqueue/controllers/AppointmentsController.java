@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -56,10 +57,9 @@ public class AppointmentsController {
           .header("X-Ratelimit-Remaining", String.valueOf(probe.getRemainingTokens()))
           .body(appointmentService.bookSlot(requestDto));
     }
-    long nanosToWait = probe.getNanosToWaitForRefill();
-    long secondsToWait = java.util.concurrent.TimeUnit.NANOSECONDS.toSeconds(nanosToWait);
+    log.warn("Temporally blocked appointment for ip: {}", ipAddress);
     return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-        .header("X-Ratelimit-Retry-After", String.valueOf(secondsToWait))
+        .header("X-Ratelimit-Retry-After", String.valueOf(TimeUnit.NANOSECONDS.toSeconds(probe.getNanosToWaitForRefill())))
         .header("X-Ratelimit-Remaining", String.valueOf(probe.getRemainingTokens()))
         .build();
   }
