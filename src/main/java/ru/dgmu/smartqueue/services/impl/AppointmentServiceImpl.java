@@ -46,7 +46,7 @@ public class AppointmentServiceImpl implements AppointmentService {
   private final AdminSettingService adminSettingService;
 
   @Override
-  @Transactional
+  @Transactional(timeout = 15)
   public Long bookSlot(AppointmentsRequestDto requestDto) {
     validateBookingDateExpiring(requestDto.date());
     Slot slot = slotRepository.getSlotByStartTimeAtAndDegreeProgram_Id(
@@ -58,9 +58,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     VerificationCode verificationCode = OneTimeTokenGenerator.generateCode();
     appointmentRepository.deleteByDegreeIdAndPhone(requestDto.degreeId(),
         requestDto.phone());
-    Appointment appointment = buildEntity(requestDto, verificationCode, slot);
-    Appointment notVerifiedAppointment = appointmentRepository.save(appointment);
-    if (isSlotAlreadyOverflowed(appointment)) {
+    Appointment notVerifiedAppointment =
+        appointmentRepository.save(buildEntity(requestDto, verificationCode, slot));
+    if (isSlotAlreadyOverflowed(notVerifiedAppointment)) {
       throw new SlotOverflowed("Данный слот уже занят");
     }
     mobileVerificationSenderService.sendVerificationCode(notVerifiedAppointment.getPhone(),

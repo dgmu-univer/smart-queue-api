@@ -2,6 +2,7 @@ package ru.dgmu.smartqueue.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.QueryTimeoutException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -29,6 +30,13 @@ public class GlobalExceptionHandler {
     log.warn("Resource not found: {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.NOT_FOUND)
         .body(new ApiError(e.getMessage(), HttpStatus.NOT_FOUND.value()));
+  }
+
+  @ExceptionHandler(QueryTimeoutException.class)
+  public ResponseEntity<ApiError> handleResourceNotFoundException(QueryTimeoutException e) {
+    log.warn("Timeout exception was thrown: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT)
+        .body(new ApiError("Истекло время ожидания запроса", HttpStatus.REQUEST_TIMEOUT.value()));
   }
 
   @ExceptionHandler(ValidationException.class)
