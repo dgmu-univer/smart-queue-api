@@ -38,7 +38,10 @@ server:
 
 app:
   appointments:
-    ttl-minutes: ${APPOINTMENTS_TTL_MINUTES:5}
+    ttl-minutes: ${APPOINTMENTS_TTL_MINUTES:10}
+    book:
+      attempts-count: ${APPOINTMENTS_ATTEMPTS_COUNT:2}
+      attempts-refresh-interval-in-min: ${APPOINTMENTS_ATTEMPTS_REFRESH_INTERVAL_IN_MIN:60}
   sms:
     apiKey: ${SMS_API_KEY}
     url: ${SMS_URL}
