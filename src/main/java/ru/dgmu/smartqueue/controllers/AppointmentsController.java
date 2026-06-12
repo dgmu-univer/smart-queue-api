@@ -35,6 +35,8 @@ import ru.dgmu.smartqueue.services.AppointmentService;
 @Tag(name = "Appointments", description = "Управление записями")
 public class AppointmentsController {
 
+  private static final String X_FORWARDED_FOR = "X-Forwarded-For";
+
   private final AppointmentService appointmentService;
   private final AppointmentBookRateLimiterComponent appointmentBookRateLimiterComponent;
 
@@ -42,8 +44,7 @@ public class AppointmentsController {
   @Operation(summary = "Запись в слот", description = "Создает новую неверефицированную запись")
   public ResponseEntity<Long> bookSlot(@RequestBody @Valid AppointmentsRequestDto requestDto,
       HttpServletRequest request) {
-    var ipAddress = request.getRemoteAddr();
-
+    String ipAddress = request.getHeader(X_FORWARDED_FOR);
     ConsumptionProbe probe;
     try {
       probe = appointmentBookRateLimiterComponent.resolveBucket(ipAddress)
