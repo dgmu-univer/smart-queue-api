@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.dgmu.smartqueue.dtos.AppointmentBookingResponseDto;
 import ru.dgmu.smartqueue.dtos.AppointmentDto;
 import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
+import ru.dgmu.smartqueue.dtos.AppointmentsExistingValidationRequestDto;
 import ru.dgmu.smartqueue.dtos.AppointmentsRequestDto;
 import ru.dgmu.smartqueue.dtos.CalendarAppointmentsResponseDto;
 import ru.dgmu.smartqueue.dtos.SlotsWithPinsDto;
@@ -150,6 +151,12 @@ public class AppointmentServiceImpl implements AppointmentService {
   @Override
   public long countByDegreeAndDate(Long degreeId, LocalDate date) {
     return appointmentRepository.countByDateAndDegreeProgramId(date, degreeId);
+  }
+
+  @Override
+  public boolean checkExisting(AppointmentsExistingValidationRequestDto requestDto) {
+    return appointmentRepository.existsBySlot_DegreeProgram_IdAndPhoneAndIsVerifiedTrue(
+        requestDto.degreeId(), requestDto.phone());
   }
 
   @Scheduled(cron = "0 * * * * *")
