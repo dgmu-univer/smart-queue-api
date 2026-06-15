@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,9 +12,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.dgmu.smartqueue.dtos.AppointmentBookingResponseDto;
 import ru.dgmu.smartqueue.dtos.AppointmentDto;
 import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
-import ru.dgmu.smartqueue.dtos.AppointmentsExistingValidationRequestDto;
 import ru.dgmu.smartqueue.dtos.AppointmentsRequestDto;
 import ru.dgmu.smartqueue.dtos.CalendarAppointmentsResponseDto;
 import ru.dgmu.smartqueue.dtos.SlotsWithPinsDto;
@@ -30,14 +31,13 @@ import ru.dgmu.smartqueue.repositories.SlotRepository;
 import ru.dgmu.smartqueue.services.AdminSettingService;
 import ru.dgmu.smartqueue.services.AppointmentService;
 import ru.dgmu.smartqueue.services.MobileVerificationSenderService;
-import ru.dgmu.smartqueue.services.impl.OneTimeTokenGenerator.VerificationCode;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AppointmentServiceImpl implements AppointmentService {
 
-  @Value("${app.appointments.ttl-minutes:15}")
+  @Value("${app.appointments.ttl-minutes:30}")
   private long ttlMinutes;
 
   private final SlotRepository slotRepository;
@@ -47,7 +47,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
   @Override
   @Transactional(timeout = 15)
-  public Long bookSlot(AppointmentsRequestDto requestDto) {
+  public AppointmentBookingResponseDto bookSlot(AppointmentsRequestDto requestDto) {
     validateBookingDateExpiring(requestDto.date());
     Slot slot = slotRepository.getSlotByStartTimeAtAndDegreeProgram_Id(
             LocalDateTime.of(requestDto.date(),
@@ -55,17 +55,29 @@ public class AppointmentServiceImpl implements AppointmentService {
         .orElseThrow(() -> new ResourceNotFoundException(
             "Ресурс: 'Слот' для уровня образования с идентификатором: %s и на время %s не найден".formatted(
                 requestDto.degreeId(), requestDto.date())));
-    VerificationCode verificationCode = OneTimeTokenGenerator.generateCode();
-    appointmentRepository.deleteByDegreeIdAndPhone(requestDto.degreeId(),
-        requestDto.phone());
-    Appointment notVerifiedAppointment =
-        appointmentRepository.save(buildEntity(requestDto, verificationCode, slot));
-    if (isSlotAlreadyOverflowed(notVerifiedAppointment)) {
-      throw new SlotOverflowed("Данный слот уже занят");
+    Optional<Appointment> pendingAppointment = appointmentRepository.findBySlot_DegreeProgram_IdAndPhoneAndIsVerifiedFalse(
+        requestDto.degreeId(), requestDto.phone());
+    Optional<Appointment> confirmedAppointment = appointmentRepository.findBySlot_DegreeProgram_IdAndPhoneAndIsVerifiedTrue(
+        requestDto.degreeId(), requestDto.phone());
+
+    ExistingResponseStatus status;
+    String pin;
+    if (pendingAppointment.isPresent()) {
+      status = ExistingResponseStatus.PENDING;
+      pin = pendingAppointment.get().getPin();
+    } else if (confirmedAppointment.isPresent()) {
+      status = ExistingResponseStatus.CONFIRMED;
+      pin = confirmedAppointment.get().getPin();
+    } else {
+      status = ExistingResponseStatus.NEW;
+      pin = OneTimeTokenGenerator.generateCode().value();
     }
-    mobileVerificationSenderService.sendVerificationCode(notVerifiedAppointment.getPhone(),
-        notVerifiedAppointment.getPin());
-    return notVerifiedAppointment.getId();
+
+    Appointment appointment = saveAndValidateAppointment(requestDto, slot, pin);
+    if (status == ExistingResponseStatus.NEW) {
+      mobileVerificationSenderService.sendVerificationCode(appointment.getPhone(), appointment.getPin());
+    }
+    return new AppointmentBookingResponseDto(appointment.getId(), status);
   }
 
   private void validateBookingDateExpiring(LocalDate date) {
@@ -73,6 +85,16 @@ public class AppointmentServiceImpl implements AppointmentService {
       throw new SlotExpired(
           "Вы не можете записаться в слот с временем начала ранее текущего времени");
     }
+  }
+
+  private Appointment saveAndValidateAppointment(AppointmentsRequestDto requestDto, Slot slot, String pin) {
+    appointmentRepository.deleteByDegreeIdAndPhone(requestDto.degreeId(), requestDto.phone());
+    Appointment appointment = appointmentRepository.save(buildEntity(requestDto, pin, slot));
+
+    if (isSlotAlreadyOverflowed(appointment)) {
+      throw new SlotOverflowed("Данный слот уже занят");
+    }
+    return appointment;
   }
 
   private boolean isSlotAlreadyOverflowed(Appointment appointment) {
@@ -130,13 +152,6 @@ public class AppointmentServiceImpl implements AppointmentService {
     return appointmentRepository.countByDateAndDegreeProgramId(date, degreeId);
   }
 
-  @Override
-  public boolean checkExisting(AppointmentsExistingValidationRequestDto requestDto) {
-    return appointmentRepository.existsBySlot_DegreeProgram_IdAndPhoneAndIsVerifiedTrue(
-        requestDto.degreeId(),
-        requestDto.phone());
-  }
-
   @Scheduled(cron = "0 * * * * *")
   @Transactional
   public void cleanupExpiredAppointments() {
@@ -156,8 +171,14 @@ public class AppointmentServiceImpl implements AppointmentService {
   }
 
   private Appointment buildEntity(AppointmentsRequestDto requestDto,
-      VerificationCode verificationCode, Slot slot) {
-    return new Appointment(null, verificationCode.value(), requestDto.phone(), Boolean.FALSE,
+      String pin, Slot slot) {
+    return new Appointment(null, pin, requestDto.phone(), Boolean.FALSE,
         LocalDateTime.now(ZoneOffset.UTC), slot);
+  }
+
+  public enum ExistingResponseStatus {
+    NEW,
+    PENDING,
+    CONFIRMED
   }
 }

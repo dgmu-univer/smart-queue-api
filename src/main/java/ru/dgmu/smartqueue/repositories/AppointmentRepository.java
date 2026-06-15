@@ -3,6 +3,7 @@ package ru.dgmu.smartqueue.repositories;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,6 +22,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
           AND dp.id = :degreeId
       """)
   List<Appointment> findAllByInterval(LocalDate from, LocalDate to, Long degreeId);
+
+  Optional<Appointment> findBySlot_DegreeProgram_IdAndPhoneAndIsVerifiedFalse(Long degreeId, String phone);
+  Optional<Appointment> findBySlot_DegreeProgram_IdAndPhoneAndIsVerifiedTrue(Long degreeId, String phone);
 
   @Query("""
       SELECT COUNT(a) FROM Appointment a

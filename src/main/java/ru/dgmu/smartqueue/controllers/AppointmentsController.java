@@ -20,10 +20,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.dgmu.smartqueue.component.AppointmentBookRateLimiterComponent;
+import ru.dgmu.smartqueue.dtos.AppointmentBookingResponseDto;
 import ru.dgmu.smartqueue.dtos.AppointmentDto;
-import ru.dgmu.smartqueue.dtos.AppointmentExistingValidationResponseDto;
 import ru.dgmu.smartqueue.dtos.AppointmentVerificationRequest;
-import ru.dgmu.smartqueue.dtos.AppointmentsExistingValidationRequestDto;
 import ru.dgmu.smartqueue.dtos.AppointmentsRequestDto;
 import ru.dgmu.smartqueue.dtos.CalendarAppointmentsResponseDto;
 import ru.dgmu.smartqueue.services.AppointmentService;
@@ -45,8 +44,8 @@ public class AppointmentsController {
 
   @PostMapping("/public/appointments")
   @Operation(summary = "Запись в слот", description = "Создает новую неверефицированную запись")
-  public ResponseEntity<Long> bookSlot(@RequestBody @Valid AppointmentsRequestDto requestDto,
-      HttpServletRequest request) {
+  public ResponseEntity<AppointmentBookingResponseDto> bookSlot(
+      @RequestBody @Valid AppointmentsRequestDto requestDto, HttpServletRequest request) {
     String ipAddress = request.getHeader(X_FORWARDED_FOR_HEADER);
     ConsumptionProbe probe;
     try {
@@ -58,25 +57,19 @@ public class AppointmentsController {
     }
     if (probe.isConsumed()) {
       return ResponseEntity.status(HttpStatus.OK)
-          .header(AC_EXPOSE_HEADERS_HEADER, "%s, %s".formatted(X_RATE_LIMIT_RETRY_AFTER_HEADER, X_RATE_LIMIT_REMAINING_HEADER))
+          .header(AC_EXPOSE_HEADERS_HEADER,
+              "%s, %s".formatted(X_RATE_LIMIT_RETRY_AFTER_HEADER, X_RATE_LIMIT_REMAINING_HEADER))
           .header(X_RATE_LIMIT_REMAINING_HEADER, String.valueOf(probe.getRemainingTokens()))
           .body(appointmentService.bookSlot(requestDto));
     }
     log.warn("Temporally blocked appointment for ip: {}", ipAddress);
     return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-        .header(AC_EXPOSE_HEADERS_HEADER, "%s, %s".formatted(X_RATE_LIMIT_RETRY_AFTER_HEADER, X_RATE_LIMIT_REMAINING_HEADER))
-        .header(X_RATE_LIMIT_RETRY_AFTER_HEADER, String.valueOf(TimeUnit.NANOSECONDS.toSeconds(probe.getNanosToWaitForRefill())))
+        .header(AC_EXPOSE_HEADERS_HEADER,
+            "%s, %s".formatted(X_RATE_LIMIT_RETRY_AFTER_HEADER, X_RATE_LIMIT_REMAINING_HEADER))
+        .header(X_RATE_LIMIT_RETRY_AFTER_HEADER,
+            String.valueOf(TimeUnit.NANOSECONDS.toSeconds(probe.getNanosToWaitForRefill())))
         .header(X_RATE_LIMIT_REMAINING_HEADER, String.valueOf(probe.getRemainingTokens()))
         .build();
-  }
-
-  @PostMapping("/public/appointments/existing-validation")
-  @Operation(summary = "Проверка на существование ранее созданных записей по номеру телефона и программе образования",
-      description = "Проверяет наличие записей по номеру телефона и программе образования")
-  public ResponseEntity<AppointmentExistingValidationResponseDto> checkExisting(@RequestBody @Valid
-      AppointmentsExistingValidationRequestDto requestDto) {
-    return ResponseEntity.ok(new AppointmentExistingValidationResponseDto(
-        appointmentService.checkExisting(requestDto)));
   }
 
   @PostMapping("/public/appointments/verification")
