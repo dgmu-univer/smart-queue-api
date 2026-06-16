@@ -52,13 +52,8 @@
     <sql>
       INSERT INTO users (id, username, first_name, middle_name, last_name, password,
                          is_enabled, role)
-      VALUES (1, 'user', 'ruslan', 'gadzhiev', 'yunusovich',
-              '$2a$10$MoBQnIfkOsC/dVfjNriBX.7mlUbE7rigy3.0y3uftQ69dH8x8XDMa', true,
-              'OPERATOR');
-      INSERT INTO users (id, username, first_name, middle_name, last_name, password,
-                         is_enabled, role)
-      VALUES (2, 'admin', 'admin', 'admin', 'admin',
-              '$2a$10$MoBQnIfkOsC/dVfjNriBX.7mlUbE7rigy3.0y3uftQ69dH8x8XDMa', true,
+      VALUES (1, 'Telman-vezirov', 'Тельман', 'Везиров', null,
+              '$2a$10$qtzwtbJR0kMnfVlG9Z3ZGuL9Lx73InydQupC4jErx3qWjpGYCz1fe', true,
               'ADMIN');
     </sql>
   </changeSet>

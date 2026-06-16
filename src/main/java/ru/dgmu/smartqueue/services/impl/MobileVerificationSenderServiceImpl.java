@@ -21,10 +21,21 @@ public class MobileVerificationSenderServiceImpl implements MobileVerificationSe
   public void sendVerificationCode(String phone, String verificationCode) {
     try {
       var parsedPhone = phoneUtil.parse(phone, "RU");
-      var phoneWithCountryCode = parsedPhone.getCountryCode() + "" + parsedPhone.getNationalNumber();
-      smsClient.sendSms(SMS_TEMPLATE.formatted(verificationCode), phoneWithCountryCode);
+      var phoneWithCountryCode =
+          parsedPhone.getCountryCode() + "" + parsedPhone.getNationalNumber();
+      smsClient.sendSms(SMS_TEMPLATE.formatted(verificationCode), phoneWithCountryCode,
+          isMtsNumber(phone));
     } catch (NumberParseException e) {
       throw new SmsSendingException(e);
     }
+  }
+
+  public boolean isMtsNumber(String phone) {
+    if (phone == null || phone.length() != 10) {
+      return false;
+    }
+    int code = (phone.charAt(0) - '0') * 100 + (phone.charAt(1) - '0') * 10 + (phone.charAt(2) - '0');
+    return (code >= 910 && code <= 919) || (code >= 980 && code <= 989) ||
+        code == 958 || code == 978 || code == 861 || code == 862;
   }
 }

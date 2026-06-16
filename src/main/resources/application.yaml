@@ -46,3 +46,4 @@ app:
     apiKey: ${SMS_API_KEY}
     url: ${SMS_URL}
     number: ${SMS_NUMBER}
+    alpha-name: ${SMS_ALPHA_NAME}
