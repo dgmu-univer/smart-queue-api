@@ -21,6 +21,7 @@ services:
       SMS_API_KEY: ${SMS_API_KEY}
       SMS_URL: ${SMS_URL}
       SMS_NUMBER: ${SMS_NUMBER}
+      SMS_ALPHA_NAME: ${SMS_ALPHA_NAME}
     depends_on:
       db:
         condition: service_healthy

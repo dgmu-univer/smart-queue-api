@@ -14,6 +14,9 @@ public class MtsExolveClient {
   @Value("${app.sms.url}")
   private String url;
 
+  @Value("${app.sms.alpha-name}")
+  private  String senderAlphaName;
+
   @Value("${app.sms.number}")
   private String senderNumber;
 
@@ -23,14 +26,14 @@ public class MtsExolveClient {
     this.restClient = RestClient.create();
   }
 
-  public void sendSms(String message, String destinationNumber) {
-//    restClient.post()
-//        .uri(url)
-//        .contentType(MediaType.APPLICATION_JSON)
-//        .header("Authorization", "Bearer %s".formatted(apiKey))
-//        .body(new RequestBody(senderNumber, destinationNumber, message))
-//        .retrieve()
-//        .toBodilessEntity();
+  public void sendSms(String message, String destinationNumber, boolean useAlphaName) {
+    restClient.post()
+        .uri(url)
+        .contentType(MediaType.APPLICATION_JSON)
+        .header("Authorization", "Bearer %s".formatted(apiKey))
+        .body(new RequestBody(useAlphaName ? senderAlphaName : senderNumber, destinationNumber, message))
+        .retrieve()
+        .toBodilessEntity();
   }
 
   record RequestBody(
