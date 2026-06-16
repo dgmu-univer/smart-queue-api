@@ -1,10 +1,11 @@
 package ru.dgmu.smartqueue.services.impl;
 
-import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import ru.dgmu.smartqueue.clients.MtsExolveClient;
+import ru.dgmu.smartqueue.exceptions.NumberWasNotFoundException;
 import ru.dgmu.smartqueue.exceptions.SmsSendingException;
 import ru.dgmu.smartqueue.services.MobileVerificationSenderService;
 
@@ -25,7 +26,9 @@ public class MobileVerificationSenderServiceImpl implements MobileVerificationSe
           parsedPhone.getCountryCode() + "" + parsedPhone.getNationalNumber();
       smsClient.sendSms(SMS_TEMPLATE.formatted(verificationCode), phoneWithCountryCode,
           isMtsNumber(phone));
-    } catch (NumberParseException e) {
+    } catch (HttpClientErrorException.NotFound e) {
+      throw new NumberWasNotFoundException();
+    } catch (Exception e) {
       throw new SmsSendingException(e);
     }
   }
