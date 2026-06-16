@@ -30,11 +30,6 @@
       </column>
     </addColumn>
 
-    <sql>
-      CREATE UNIQUE INDEX appointments_unique_verified_phone
-        ON appointments (phone) WHERE is_verified = true;
-    </sql>
-
     <comment>Add is_verified and requested_at</comment>
   </changeSet>
 
