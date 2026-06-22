@@ -32,7 +32,7 @@ public class SecurityConfig {
     http
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/public/**", "/appointments").permitAll() // todo закрыть appointments
+            .requestMatchers("/public/**", "/appointments").permitAll()
             .requestMatchers("/actuator/**").permitAll()
             .requestMatchers("/operator/login", "/login").permitAll()
             .requestMatchers("/admin/**", "/swagger-ui.html", "/v3/**", "/swagger-ui/**")
@@ -43,7 +43,7 @@ public class SecurityConfig {
         .cors(cors -> cors.configurationSource(request -> {
           var corsConfiguration = new CorsConfiguration();
           corsConfiguration.setAllowedOriginPatterns(
-              List.of("https://xn--d1aba8al4b0b.xn--c1abz2a.xn--p1ai","https://очередь.дгму.рф", "http://localhost:3000")); // todo вынести в переменную
+              List.of("https://xn--d1aba8al4b0b.xn--c1abz2a.xn--p1ai","https://очередь.дгму.рф", "http://localhost:3000"));
           corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
           corsConfiguration.setAllowedHeaders(List.of("*"));
           return corsConfiguration;
