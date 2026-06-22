@@ -24,8 +24,11 @@ public class MobileVerificationSenderServiceImpl implements MobileVerificationSe
       var parsedPhone = phoneUtil.parse(phone, "RU");
       var phoneWithCountryCode =
           parsedPhone.getCountryCode() + "" + parsedPhone.getNationalNumber();
-      smsClient.sendSms(SMS_TEMPLATE.formatted(verificationCode), phoneWithCountryCode,
-          !isMegafonOrYota(phone));
+      if (isMegafonOrYota(phone)) {
+        smsClient.sendSms(SMS_TEMPLATE.formatted(verificationCode), phoneWithCountryCode, false);
+      } else if (isMtsOrBeeline(phone)) {
+        smsClient.sendSms(SMS_TEMPLATE.formatted(verificationCode), phoneWithCountryCode, true);
+      }
     } catch (HttpClientErrorException.NotFound e) {
       throw new NumberWasNotFoundException();
     } catch (Exception e) {
@@ -33,12 +36,8 @@ public class MobileVerificationSenderServiceImpl implements MobileVerificationSe
     }
   }
 
-  public boolean isMegafonOrYota(String phone) {
-    if (phone == null || phone.length() != 10) {
-      return false;
-    }
-
-    int code = (phone.charAt(0) - '0') * 100 + (phone.charAt(1) - '0') * 10 + (phone.charAt(2) - '0');
+  private boolean isMegafonOrYota(String phone) {
+    int code = getCode(phone);
 
     if (code >= 920 && code <= 939) {
       return true;
@@ -48,5 +47,24 @@ public class MobileVerificationSenderServiceImpl implements MobileVerificationSe
       case 902, 904, 908, 950, 951, 991, 995, 996, 999 -> true;
       default -> false;
     };
+  }
+
+  private boolean isMtsOrBeeline(String phone) {
+    int code = getCode(phone);
+
+    if ((code >= 910 && code <= 919) ||
+        (code >= 960 && code <= 969) ||
+        (code >= 980 && code <= 989)) {
+      return true;
+    }
+
+    return switch (code) {
+      case 900, 901, 902, 903, 904, 905, 906, 908, 909, 950, 951, 953, 978 -> true;
+      default -> false;
+    };
+  }
+
+  private int getCode(String phone) {
+    return (phone.charAt(0) - '0') * 100 + (phone.charAt(1) - '0') * 10 + (phone.charAt(2) - '0');
   }
 }
