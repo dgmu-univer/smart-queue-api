@@ -24,11 +24,29 @@ public class MobileVerificationSenderServiceImpl implements MobileVerificationSe
       var parsedPhone = phoneUtil.parse(phone, "RU");
       var phoneWithCountryCode =
           parsedPhone.getCountryCode() + "" + parsedPhone.getNationalNumber();
-      smsClient.sendSms(SMS_TEMPLATE.formatted(verificationCode), phoneWithCountryCode);
+      smsClient.sendSms(SMS_TEMPLATE.formatted(verificationCode), phoneWithCountryCode,
+          !isMegafonOrYota(phone));
     } catch (HttpClientErrorException.NotFound e) {
       throw new NumberWasNotFoundException();
     } catch (Exception e) {
       throw new SmsSendingException(e);
     }
+  }
+
+  public boolean isMegafonOrYota(String phone) {
+    if (phone == null || phone.length() != 10) {
+      return false;
+    }
+
+    int code = (phone.charAt(0) - '0') * 100 + (phone.charAt(1) - '0') * 10 + (phone.charAt(2) - '0');
+
+    if (code >= 920 && code <= 939) {
+      return true;
+    }
+
+    return switch (code) {
+      case 902, 904, 908, 950, 951, 991, 995, 996, 999 -> true;
+      default -> false;
+    };
   }
 }

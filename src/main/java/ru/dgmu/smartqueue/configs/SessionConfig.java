@@ -14,7 +14,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 import org.springframework.session.web.context.AbstractHttpSessionApplicationInitializer;
 
 @Configuration
-@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 86400)
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 864000)
 public class SessionConfig extends AbstractHttpSessionApplicationInitializer {
 
   @Bean
