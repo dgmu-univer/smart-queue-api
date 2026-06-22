@@ -71,7 +71,7 @@ public class AuthController {
 
   @PostMapping("/logout")
   @Operation(description = "Выход администратора")
-  public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+  public ResponseEntity<Void> logout(HttpServletRequest request) {
     try {
       HttpSession session = request.getSession(false);
       if (session != null) {

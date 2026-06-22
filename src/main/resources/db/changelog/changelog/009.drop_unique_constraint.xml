@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="009.drop_unique_constraint" author="sernior_dev">
+    <preConditions>
+      <indexExists tableName="appointments" indexName="appointments_unique_verified_phone"/>
+    </preConditions>
+    <sql>
+      drop index appointments_unique_verified_phone;
+    </sql>
+  </changeSet>
+</databaseChangeLog>
