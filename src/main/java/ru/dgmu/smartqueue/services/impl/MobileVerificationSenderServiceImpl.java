@@ -2,6 +2,7 @@ package ru.dgmu.smartqueue.services.impl;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import ru.dgmu.smartqueue.clients.MtsExolveClient;
@@ -11,6 +12,7 @@ import ru.dgmu.smartqueue.services.MobileVerificationSenderService;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MobileVerificationSenderServiceImpl implements MobileVerificationSenderService {
 
   private static final String SMS_TEMPLATE = "PIN: %s для онлайн-записи в приёмную комиссию ДГМУ";
@@ -32,7 +34,7 @@ public class MobileVerificationSenderServiceImpl implements MobileVerificationSe
     } catch (HttpClientErrorException.NotFound e) {
       throw new NumberWasNotFoundException();
     } catch (Exception e) {
-      throw new SmsSendingException(e);
+      log.error("Ошибка отправки СМС", e);
     }
   }
 
